@@ -189,4 +189,4 @@ async def delete_ml_model(
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"mlmodels/{model_id}", params=params)
 
-    return [types.TextContent(type="text", text=f"ML model {model_id} deleted successfully")] 
+    return [types.TextContent(type="text", text=f"ML model {model_id} deleted successfully")]

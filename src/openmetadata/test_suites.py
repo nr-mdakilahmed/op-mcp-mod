@@ -54,7 +54,7 @@ async def list_test_suites(
     """
     client = get_client()
     params = {"limit": min(max(1, limit), 1000000), "offset": max(0, offset)}
-    
+
     if fields:
         params["fields"] = fields
     if test_suite_type:
@@ -268,7 +268,7 @@ async def get_data_quality_report(
     """
     client = get_client()
     params = {}
-    
+
     if q:
         params["q"] = q
     if aggregation_query:
@@ -278,4 +278,4 @@ async def get_data_quality_report(
 
     result = client.get("dataQuality/testSuites/dataQualityReport", params=params)
 
-    return [types.TextContent(type="text", text=str(result))] 
+    return [types.TextContent(type="text", text=str(result))]

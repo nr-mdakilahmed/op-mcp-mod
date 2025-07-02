@@ -5,7 +5,7 @@ full-text search, entity suggestions, and advanced search filtering.
 Search APIs help discover and explore data assets across the organization.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Callable, List, Optional, Union
 
 import mcp.types as types
 
@@ -57,7 +57,7 @@ async def search_entities(
         "from": from_,
         "size": min(max(1, size), 100),
     }
-    
+
     if index:
         params["index"] = index
     if sort:
@@ -105,7 +105,7 @@ async def suggest_entities(
         "q": q,
         "size": min(max(1, size), 25),
     }
-    
+
     if index:
         params["index"] = index
     if field:
@@ -141,7 +141,7 @@ async def search_aggregate(
         "from": from_,
         "size": min(max(1, size), 100),
     }
-    
+
     if index:
         params["index"] = index
     if facets:
@@ -175,10 +175,10 @@ async def search_field_query(
         "fieldValue": field_value,
         "size": min(max(1, size), 100),
     }
-    
+
     if index:
         params["index"] = index
 
     result = client.get("search/fieldQuery", params=params)
 
-    return [types.TextContent(type="text", text=str(result))] 
+    return [types.TextContent(type="text", text=str(result))]

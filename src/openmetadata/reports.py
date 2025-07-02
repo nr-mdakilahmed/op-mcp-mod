@@ -189,4 +189,4 @@ async def delete_report(
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"reports/{report_id}", params=params)
 
-    return [types.TextContent(type="text", text=f"Report {report_id} deleted successfully")] 
+    return [types.TextContent(type="text", text=f"Report {report_id} deleted successfully")]

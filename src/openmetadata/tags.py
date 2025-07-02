@@ -56,7 +56,7 @@ async def list_tags(
     """
     client = get_client()
     params = {"limit": min(max(1, limit), 1000000), "offset": max(0, offset)}
-    
+
     if fields:
         params["fields"] = fields
     if parent:
@@ -229,7 +229,7 @@ async def list_tag_categories(
     """
     client = get_client()
     params = {"limit": min(max(1, limit), 1000000), "offset": max(0, offset)}
-    
+
     if fields:
         params["fields"] = fields
     if include_deleted:
@@ -344,4 +344,4 @@ async def delete_tag_category(
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"classifications/{category_id}", params=params)
 
-    return [types.TextContent(type="text", text=f"Tag category {category_id} deleted successfully")] 
+    return [types.TextContent(type="text", text=f"Tag category {category_id} deleted successfully")]
