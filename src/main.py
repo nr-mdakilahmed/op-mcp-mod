@@ -5,18 +5,18 @@ dynamically loads and registers API modules based on user selection,
 and manages server lifecycle with chosen transport protocol.
 """
 
-from typing import Dict, List
+from typing import List
 
 import click
 from fastmcp import FastMCP
 
 from src.config import Config
 from src.enums import APIType
-from src.openmetadata.openmetadata_client import initialize_client
-from src.server import get_server_runner
 
 # Import API modules
-from src.openmetadata import table, database, schema
+from src.openmetadata import database, schema, table
+from src.openmetadata.openmetadata_client import initialize_client
+from src.server import get_server_runner
 
 # Map API types to their respective function collections
 APITYPE_TO_FUNCTIONS = {
@@ -74,17 +74,17 @@ def main(transport: str, port: int, apis: List[str]) -> int:
             if api_type in APITYPE_TO_FUNCTIONS:
                 get_functions = APITYPE_TO_FUNCTIONS[api_type]
                 functions = get_functions()
-                
+
                 for func, name, description in functions:
                     app.add_tool(func, name=name, description=description)
                     registered_count += 1
-                
+
                 print(f"Registered {len(functions)} tools from {api_type.value} API")
             else:
                 print(f"Warning: API type '{api}' not implemented yet")
 
         print(f"Total registered tools: {registered_count}")
-        
+
         # Start server with selected transport
         server_runner = get_server_runner(app, transport, port=port)
         return server_runner()

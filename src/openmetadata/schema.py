@@ -13,7 +13,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -56,14 +56,14 @@ async def list_schemas(
         params["include"] = "all"
 
     result = client.get("databaseSchemas", params=params)
-    
+
     # Add UI URLs for web interface integration
     if "data" in result:
         for schema in result["data"]:
             schema_fqn = schema.get("fullyQualifiedName", "")
             if schema_fqn:
                 schema["ui_url"] = f"{client.host}/schema/{schema_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -86,12 +86,12 @@ async def get_schema(
         params["fields"] = fields
 
     result = client.get(f"databaseSchemas/{schema_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     schema_fqn = result.get("fullyQualifiedName", "")
     if schema_fqn:
         result["ui_url"] = f"{client.host}/schema/{schema_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -114,12 +114,12 @@ async def get_schema_by_name(
         params["fields"] = fields
 
     result = client.get(f"databaseSchemas/name/{fqn}", params=params)
-    
+
     # Add UI URL for web interface integration
     schema_fqn = result.get("fullyQualifiedName", "")
     if schema_fqn:
         result["ui_url"] = f"{client.host}/schema/{schema_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -136,12 +136,12 @@ async def create_schema(
     """
     client = get_client()
     result = client.post("databaseSchemas", json_data=schema_data)
-    
+
     # Add UI URL for web interface integration
     schema_fqn = result.get("fullyQualifiedName", "")
     if schema_fqn:
         result["ui_url"] = f"{client.host}/schema/{schema_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -160,12 +160,12 @@ async def update_schema(
     """
     client = get_client()
     result = client.put(f"databaseSchemas/{schema_id}", json_data=schema_data)
-    
+
     # Add UI URL for web interface integration
     schema_fqn = result.get("fullyQualifiedName", "")
     if schema_fqn:
         result["ui_url"] = f"{client.host}/schema/{schema_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -187,5 +187,5 @@ async def delete_schema(
     client = get_client()
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"databaseSchemas/{schema_id}", params=params)
-    
-    return [types.TextContent(type="text", text=f"Schema {schema_id} deleted successfully")] 
+
+    return [types.TextContent(type="text", text=f"Schema {schema_id} deleted successfully")]

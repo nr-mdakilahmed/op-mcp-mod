@@ -427,6 +427,11 @@ dev = [
     { name = "twine" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "ruff" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "anyio", specifier = ">=4.2.0" },
@@ -440,6 +445,9 @@ requires-dist = [
     { name = "uvicorn", specifier = ">=0.27.1" },
 ]
 provides-extras = ["dev"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "ruff", specifier = ">=0.9.6" }]
 
 [[package]]
 name = "mdurl"

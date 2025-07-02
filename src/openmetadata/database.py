@@ -13,7 +13,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -56,14 +56,14 @@ async def list_databases(
         params["include"] = "all"
 
     result = client.get("databases", params=params)
-    
+
     # Add UI URLs for web interface integration
     if "data" in result:
         for database in result["data"]:
             database_fqn = database.get("fullyQualifiedName", "")
             if database_fqn:
                 database["ui_url"] = f"{client.host}/database/{database_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -86,12 +86,12 @@ async def get_database(
         params["fields"] = fields
 
     result = client.get(f"databases/{database_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     database_fqn = result.get("fullyQualifiedName", "")
     if database_fqn:
         result["ui_url"] = f"{client.host}/database/{database_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -114,12 +114,12 @@ async def get_database_by_name(
         params["fields"] = fields
 
     result = client.get(f"databases/name/{fqn}", params=params)
-    
+
     # Add UI URL for web interface integration
     database_fqn = result.get("fullyQualifiedName", "")
     if database_fqn:
         result["ui_url"] = f"{client.host}/database/{database_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -136,12 +136,12 @@ async def create_database(
     """
     client = get_client()
     result = client.post("databases", json_data=database_data)
-    
+
     # Add UI URL for web interface integration
     database_fqn = result.get("fullyQualifiedName", "")
     if database_fqn:
         result["ui_url"] = f"{client.host}/database/{database_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -160,12 +160,12 @@ async def update_database(
     """
     client = get_client()
     result = client.put(f"databases/{database_id}", json_data=database_data)
-    
+
     # Add UI URL for web interface integration
     database_fqn = result.get("fullyQualifiedName", "")
     if database_fqn:
         result["ui_url"] = f"{client.host}/database/{database_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -187,5 +187,5 @@ async def delete_database(
     client = get_client()
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"databases/{database_id}", params=params)
-    
-    return [types.TextContent(type="text", text=f"Database {database_id} deleted successfully")] 
+
+    return [types.TextContent(type="text", text=f"Database {database_id} deleted successfully")]
