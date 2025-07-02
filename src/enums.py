@@ -7,7 +7,7 @@ class APIType(str, Enum):
     # Core Entities
     TABLE = "table"
     DATABASE = "database"
-    SCHEMA = "schema"
+    SCHEMA = "databaseschema"  # Maps to databaseSchemas endpoint
     COLUMN = "column"
 
     # Data Assets
@@ -26,6 +26,7 @@ class APIType(str, Enum):
     CLASSIFICATION = "classification"
     TAG = "tag"
     GLOSSARY = "glossary"
+    GLOSSARYTERM = "glossaryterm"
     POLICY = "policy"
 
     # Lineage & Usage
