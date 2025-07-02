@@ -7,34 +7,57 @@ class APIType(str, Enum):
     # Core Entities
     TABLE = "table"
     DATABASE = "database"
-    SCHEMA = "schema"
-    COLUMN = "column"
+    SCHEMA = "databaseschema"  # Maps to databaseSchemas endpoint
 
     # Data Assets
     DASHBOARD = "dashboard"
     CHART = "chart"
     PIPELINE = "pipeline"
     TOPIC = "topic"
-
-    # Data Quality
-    DATAQUALITYTESTS = "dataqualitytests"
-    TESTCASES = "testcases"
     METRICS = "metrics"
-    PROFILER = "profiler"
+    CONTAINER = "container"
+    REPORT = "report"
+    ML_MODEL = "mlmodel"
 
-    # Governance
+    # Users & Teams
+    USER = "user"
+    TEAM = "team"
+
+    # Governance & Classification
     CLASSIFICATION = "classification"
-    TAG = "tag"
     GLOSSARY = "glossary"
-    POLICY = "policy"
+    TAG = "tag"
 
-    # Lineage & Usage
+    # System & Operations
+    BOT = "bot"
+    SERVICES = "services"
+    EVENT = "event"
+
+    # Analytics & Monitoring
     LINEAGE = "lineage"
     USAGE = "usage"
-    COST = "cost"
+    SEARCH = "search"
 
-    # System Management
-    SERVICES = "services"
-    INGESTION = "ingestion"
-    WEBHOOKS = "webhooks"
-    BOTS = "bots"
+    # Data Quality
+    TEST_CASE = "test_case"
+    TEST_SUITE = "test_suite"
+
+    # Access Control & Security
+    POLICY = "policy"
+    ROLE = "role"
+
+    # Domain Management
+    DOMAIN = "domain"
+
+    # Not Yet Implemented - Future Expansion
+    # These are placeholder values for future implementation
+    # API_COLLECTION = "api_collection"
+    # API_ENDPOINT = "api_endpoint"
+    # APP = "app"
+    # FEED = "feed"
+    # PERSONA = "persona"
+    # QUERY = "query"
+    # SEARCH_INDEX = "search_index"
+    # STORED_PROCEDURE = "stored_procedure"
+    # SUGGESTION = "suggestion"
+    # WEBHOOK = "webhook"
