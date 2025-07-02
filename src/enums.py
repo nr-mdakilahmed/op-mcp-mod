@@ -8,34 +8,47 @@ class APIType(str, Enum):
     TABLE = "table"
     DATABASE = "database"
     SCHEMA = "databaseschema"  # Maps to databaseSchemas endpoint
-    COLUMN = "column"
 
     # Data Assets
     DASHBOARD = "dashboard"
     CHART = "chart"
     PIPELINE = "pipeline"
     TOPIC = "topic"
-
-    # Data Quality
-    DATAQUALITYTESTS = "dataqualitytests"
-    TESTCASES = "testcases"
     METRICS = "metrics"
-    PROFILER = "profiler"
+    CONTAINER = "container"
 
-    # Governance
+    # Users & Teams
+    USER = "user"
+    TEAM = "team"
+
+    # Governance & Classification
     CLASSIFICATION = "classification"
-    TAG = "tag"
     GLOSSARY = "glossary"
-    GLOSSARYTERM = "glossaryterm"
-    POLICY = "policy"
 
-    # Lineage & Usage
+    # System & Operations
+    BOT = "bot"
+
+    # Analytics & Monitoring
     LINEAGE = "lineage"
     USAGE = "usage"
-    COST = "cost"
 
-    # System Management
-    SERVICES = "services"
-    INGESTION = "ingestion"
-    WEBHOOKS = "webhooks"
-    BOTS = "bots"
+    # Additional API groups available in OpenMetadata (not yet implemented)
+    API_COLLECTION = "apicollection"
+    API_ENDPOINT = "apiendpoint"
+    APP = "app"
+    DATA_PRODUCT = "dataproduct"
+    DOC_STORE = "docstore"
+    DOMAIN = "domain"
+    EVENT = "event"
+    FEED = "feed"
+    ML_MODEL = "mlmodel"
+    PERMISSION = "permission"
+    PERSONA = "persona"
+    POLICY = "policy"
+    QUERY = "query"
+    REPORT = "report"
+    ROLE = "role"
+    SEARCH_INDEX = "searchindex"
+    STORED_PROCEDURE = "storedprocedure"
+    SUGGESTION = "suggestion"
+    TAG = "tag"

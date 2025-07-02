@@ -14,7 +14,11 @@ from src.config import Config
 from src.enums import APIType
 
 # Import API modules
-from src.openmetadata import database, schema, table
+from src.openmetadata import (
+    database, schema, table, dashboards, charts, pipelines, 
+    topics, containers, metrics, users, teams, classifications, 
+    glossary, bots, lineage, usage
+)
 from src.openmetadata.openmetadata_client import initialize_client
 from src.server import get_server_runner
 
@@ -30,7 +34,7 @@ APITYPE_TO_FUNCTIONS = {
     APIType.PIPELINE: pipelines.get_all_functions,
     APIType.TOPIC: topics.get_all_functions,
     APIType.CONTAINER: containers.get_all_functions,
-    APIType.METRIC: metrics.get_all_functions,
+    APIType.METRICS: metrics.get_all_functions,
     # Users & Teams
     APIType.USER: users.get_all_functions,
     APIType.TEAM: teams.get_all_functions,
@@ -72,9 +76,17 @@ SERVER_NAME = "mcp-server-openmetadata"
         APIType.DASHBOARD.value,
         APIType.CHART.value,
         APIType.PIPELINE.value,
+        APIType.TOPIC.value,
+        APIType.METRICS.value,
+        APIType.CONTAINER.value,
         APIType.USER.value,
         APIType.TEAM.value,
-    ],  # Default to core entities and common assets
+        APIType.CLASSIFICATION.value,
+        APIType.GLOSSARY.value,
+        APIType.BOT.value,
+        APIType.LINEAGE.value,
+        APIType.USAGE.value,
+    ],  # Default to all implemented APIs
     multiple=True,
     help="API groups to enable (default: core entities and common assets)",
 )
