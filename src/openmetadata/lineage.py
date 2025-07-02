@@ -5,7 +5,7 @@ retrieving upstream and downstream relationships, managing data flow, and
 analyzing impact across data assets.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, List, Union
 
 import mcp.types as types
 
@@ -14,7 +14,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -50,10 +50,10 @@ async def get_lineage(
     }
 
     result = client.get(f"lineage/{entity_type}/{entity_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     result["ui_url"] = f"{client.host}/lineage/{entity_type}/{entity_id}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -81,10 +81,10 @@ async def get_lineage_by_name(
     }
 
     result = client.get(f"lineage/{entity_type}/name/{entity_fqn}", params=params)
-    
+
     # Add UI URL for web interface integration
     result["ui_url"] = f"{client.host}/lineage/{entity_type}/{entity_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -101,7 +101,7 @@ async def add_lineage(
     """
     client = get_client()
     result = client.put("lineage", json_data=lineage_data)
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -123,7 +123,7 @@ async def delete_lineage(
         "source": source_fqn,
         "target": target_fqn,
     }
-    
+
     client.delete("lineage", params=params)
-    
-    return [types.TextContent(type="text", text=f"Lineage between {source_fqn} and {target_fqn} deleted successfully")] 
+
+    return [types.TextContent(type="text", text=f"Lineage between {source_fqn} and {target_fqn} deleted successfully")]

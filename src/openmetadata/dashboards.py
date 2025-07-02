@@ -14,7 +14,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -57,14 +57,14 @@ async def list_dashboards(
         params["include"] = "all"
 
     result = client.get("dashboards", params=params)
-    
+
     # Add UI URL for web interface integration
     if "data" in result:
         for dashboard in result["data"]:
             dashboard_fqn = dashboard.get("fullyQualifiedName", "")
             if dashboard_fqn:
                 dashboard["ui_url"] = f"{client.host}/dashboard/{dashboard_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -87,12 +87,12 @@ async def get_dashboard(
         params["fields"] = fields
 
     result = client.get(f"dashboards/{dashboard_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     dashboard_fqn = result.get("fullyQualifiedName", "")
     if dashboard_fqn:
         result["ui_url"] = f"{client.host}/dashboard/{dashboard_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -115,12 +115,12 @@ async def get_dashboard_by_name(
         params["fields"] = fields
 
     result = client.get(f"dashboards/name/{fqn}", params=params)
-    
+
     # Add UI URL for web interface integration
     dashboard_fqn = result.get("fullyQualifiedName", "")
     if dashboard_fqn:
         result["ui_url"] = f"{client.host}/dashboard/{dashboard_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -137,12 +137,12 @@ async def create_dashboard(
     """
     client = get_client()
     result = client.post("dashboards", json_data=dashboard_data)
-    
+
     # Add UI URL for web interface integration
     dashboard_fqn = result.get("fullyQualifiedName", "")
     if dashboard_fqn:
         result["ui_url"] = f"{client.host}/dashboard/{dashboard_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -161,12 +161,12 @@ async def update_dashboard(
     """
     client = get_client()
     result = client.put(f"dashboards/{dashboard_id}", json_data=dashboard_data)
-    
+
     # Add UI URL for web interface integration
     dashboard_fqn = result.get("fullyQualifiedName", "")
     if dashboard_fqn:
         result["ui_url"] = f"{client.host}/dashboard/{dashboard_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -188,5 +188,5 @@ async def delete_dashboard(
     client = get_client()
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"dashboards/{dashboard_id}", params=params)
-    
-    return [types.TextContent(type="text", text=f"Dashboard {dashboard_id} deleted successfully")] 
+
+    return [types.TextContent(type="text", text=f"Dashboard {dashboard_id} deleted successfully")]

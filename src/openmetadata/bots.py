@@ -14,7 +14,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -53,14 +53,14 @@ async def list_bots(
         params["include"] = "all"
 
     result = client.get("bots", params=params)
-    
+
     # Add UI URL for web interface integration
     if "data" in result:
         for bot in result["data"]:
             bot_name = bot.get("name", "")
             if bot_name:
                 bot["ui_url"] = f"{client.host}/bot/{bot_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -83,12 +83,12 @@ async def get_bot(
         params["fields"] = fields
 
     result = client.get(f"bots/{bot_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     bot_name = result.get("name", "")
     if bot_name:
         result["ui_url"] = f"{client.host}/bot/{bot_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -111,12 +111,12 @@ async def get_bot_by_name(
         params["fields"] = fields
 
     result = client.get(f"bots/name/{name}", params=params)
-    
+
     # Add UI URL for web interface integration
     bot_name = result.get("name", "")
     if bot_name:
         result["ui_url"] = f"{client.host}/bot/{bot_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -133,12 +133,12 @@ async def create_bot(
     """
     client = get_client()
     result = client.post("bots", json_data=bot_data)
-    
+
     # Add UI URL for web interface integration
     bot_name = result.get("name", "")
     if bot_name:
         result["ui_url"] = f"{client.host}/bot/{bot_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -157,12 +157,12 @@ async def update_bot(
     """
     client = get_client()
     result = client.put(f"bots/{bot_id}", json_data=bot_data)
-    
+
     # Add UI URL for web interface integration
     bot_name = result.get("name", "")
     if bot_name:
         result["ui_url"] = f"{client.host}/bot/{bot_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -184,5 +184,5 @@ async def delete_bot(
     client = get_client()
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"bots/{bot_id}", params=params)
-    
-    return [types.TextContent(type="text", text=f"Bot {bot_id} deleted successfully")] 
+
+    return [types.TextContent(type="text", text=f"Bot {bot_id} deleted successfully")]

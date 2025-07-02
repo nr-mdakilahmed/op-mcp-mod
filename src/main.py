@@ -24,7 +24,6 @@ APITYPE_TO_FUNCTIONS = {
     APIType.TABLE: table.get_all_functions,
     APIType.DATABASE: database.get_all_functions,
     APIType.SCHEMA: schema.get_all_functions,
-    
     # Data Assets
     APIType.DASHBOARD: dashboards.get_all_functions,
     APIType.CHART: charts.get_all_functions,
@@ -32,22 +31,17 @@ APITYPE_TO_FUNCTIONS = {
     APIType.TOPIC: topics.get_all_functions,
     APIType.CONTAINER: containers.get_all_functions,
     APIType.METRIC: metrics.get_all_functions,
-    
     # Users & Teams
     APIType.USER: users.get_all_functions,
     APIType.TEAM: teams.get_all_functions,
-    
     # Governance & Classification
     APIType.CLASSIFICATION: classifications.get_all_functions,
     APIType.GLOSSARY: glossary.get_all_functions,
-    
     # System & Operations
     APIType.BOT: bots.get_all_functions,
-    
     # Analytics & Monitoring
     APIType.LINEAGE: lineage.get_all_functions,
     APIType.USAGE: usage.get_all_functions,
-    
     # Additional API types will be added here as modules are implemented
 }
 
@@ -72,8 +66,8 @@ SERVER_NAME = "mcp-server-openmetadata"
     "--apis",
     type=click.Choice([api.value for api in APIType]),
     default=[
-        APIType.TABLE.value, 
-        APIType.DATABASE.value, 
+        APIType.TABLE.value,
+        APIType.DATABASE.value,
         APIType.SCHEMA.value,
         APIType.DASHBOARD.value,
         APIType.CHART.value,

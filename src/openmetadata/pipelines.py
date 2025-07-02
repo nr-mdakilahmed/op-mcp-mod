@@ -14,7 +14,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -57,14 +57,14 @@ async def list_pipelines(
         params["include"] = "all"
 
     result = client.get("pipelines", params=params)
-    
+
     # Add UI URL for web interface integration
     if "data" in result:
         for pipeline in result["data"]:
             pipeline_fqn = pipeline.get("fullyQualifiedName", "")
             if pipeline_fqn:
                 pipeline["ui_url"] = f"{client.host}/pipeline/{pipeline_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -87,12 +87,12 @@ async def get_pipeline(
         params["fields"] = fields
 
     result = client.get(f"pipelines/{pipeline_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     pipeline_fqn = result.get("fullyQualifiedName", "")
     if pipeline_fqn:
         result["ui_url"] = f"{client.host}/pipeline/{pipeline_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -115,12 +115,12 @@ async def get_pipeline_by_name(
         params["fields"] = fields
 
     result = client.get(f"pipelines/name/{fqn}", params=params)
-    
+
     # Add UI URL for web interface integration
     pipeline_fqn = result.get("fullyQualifiedName", "")
     if pipeline_fqn:
         result["ui_url"] = f"{client.host}/pipeline/{pipeline_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -137,12 +137,12 @@ async def create_pipeline(
     """
     client = get_client()
     result = client.post("pipelines", json_data=pipeline_data)
-    
+
     # Add UI URL for web interface integration
     pipeline_fqn = result.get("fullyQualifiedName", "")
     if pipeline_fqn:
         result["ui_url"] = f"{client.host}/pipeline/{pipeline_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -161,12 +161,12 @@ async def update_pipeline(
     """
     client = get_client()
     result = client.put(f"pipelines/{pipeline_id}", json_data=pipeline_data)
-    
+
     # Add UI URL for web interface integration
     pipeline_fqn = result.get("fullyQualifiedName", "")
     if pipeline_fqn:
         result["ui_url"] = f"{client.host}/pipeline/{pipeline_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -188,5 +188,5 @@ async def delete_pipeline(
     client = get_client()
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"pipelines/{pipeline_id}", params=params)
-    
-    return [types.TextContent(type="text", text=f"Pipeline {pipeline_id} deleted successfully")] 
+
+    return [types.TextContent(type="text", text=f"Pipeline {pipeline_id} deleted successfully")]

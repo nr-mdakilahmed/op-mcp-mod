@@ -14,7 +14,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -57,14 +57,14 @@ async def list_metrics(
         params["include"] = "all"
 
     result = client.get("metrics", params=params)
-    
+
     # Add UI URL for web interface integration
     if "data" in result:
         for metric in result["data"]:
             metric_fqn = metric.get("fullyQualifiedName", "")
             if metric_fqn:
                 metric["ui_url"] = f"{client.host}/metric/{metric_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -87,12 +87,12 @@ async def get_metric(
         params["fields"] = fields
 
     result = client.get(f"metrics/{metric_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     metric_fqn = result.get("fullyQualifiedName", "")
     if metric_fqn:
         result["ui_url"] = f"{client.host}/metric/{metric_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -115,12 +115,12 @@ async def get_metric_by_name(
         params["fields"] = fields
 
     result = client.get(f"metrics/name/{fqn}", params=params)
-    
+
     # Add UI URL for web interface integration
     metric_fqn = result.get("fullyQualifiedName", "")
     if metric_fqn:
         result["ui_url"] = f"{client.host}/metric/{metric_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -137,12 +137,12 @@ async def create_metric(
     """
     client = get_client()
     result = client.post("metrics", json_data=metric_data)
-    
+
     # Add UI URL for web interface integration
     metric_fqn = result.get("fullyQualifiedName", "")
     if metric_fqn:
         result["ui_url"] = f"{client.host}/metric/{metric_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -161,12 +161,12 @@ async def update_metric(
     """
     client = get_client()
     result = client.put(f"metrics/{metric_id}", json_data=metric_data)
-    
+
     # Add UI URL for web interface integration
     metric_fqn = result.get("fullyQualifiedName", "")
     if metric_fqn:
         result["ui_url"] = f"{client.host}/metric/{metric_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -188,5 +188,5 @@ async def delete_metric(
     client = get_client()
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"metrics/{metric_id}", params=params)
-    
-    return [types.TextContent(type="text", text=f"Metric {metric_id} deleted successfully")] 
+
+    return [types.TextContent(type="text", text=f"Metric {metric_id} deleted successfully")]

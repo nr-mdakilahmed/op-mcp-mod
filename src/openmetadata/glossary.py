@@ -14,7 +14,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -55,14 +55,14 @@ async def list_glossaries(
         params["include"] = "all"
 
     result = client.get("glossaries", params=params)
-    
+
     # Add UI URL for web interface integration
     if "data" in result:
         for glossary in result["data"]:
             glossary_name = glossary.get("name", "")
             if glossary_name:
                 glossary["ui_url"] = f"{client.host}/glossary/{glossary_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -85,12 +85,12 @@ async def get_glossary(
         params["fields"] = fields
 
     result = client.get(f"glossaries/{glossary_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     glossary_name = result.get("name", "")
     if glossary_name:
         result["ui_url"] = f"{client.host}/glossary/{glossary_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -113,12 +113,12 @@ async def get_glossary_by_name(
         params["fields"] = fields
 
     result = client.get(f"glossaries/name/{name}", params=params)
-    
+
     # Add UI URL for web interface integration
     glossary_name = result.get("name", "")
     if glossary_name:
         result["ui_url"] = f"{client.host}/glossary/{glossary_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -135,12 +135,12 @@ async def create_glossary(
     """
     client = get_client()
     result = client.post("glossaries", json_data=glossary_data)
-    
+
     # Add UI URL for web interface integration
     glossary_name = result.get("name", "")
     if glossary_name:
         result["ui_url"] = f"{client.host}/glossary/{glossary_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -159,12 +159,12 @@ async def update_glossary(
     """
     client = get_client()
     result = client.put(f"glossaries/{glossary_id}", json_data=glossary_data)
-    
+
     # Add UI URL for web interface integration
     glossary_name = result.get("name", "")
     if glossary_name:
         result["ui_url"] = f"{client.host}/glossary/{glossary_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -186,7 +186,7 @@ async def delete_glossary(
     client = get_client()
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"glossaries/{glossary_id}", params=params)
-    
+
     return [types.TextContent(type="text", text=f"Glossary {glossary_id} deleted successfully")]
 
 
@@ -219,14 +219,14 @@ async def list_glossary_terms(
         params["include"] = "all"
 
     result = client.get("glossaryTerms", params=params)
-    
+
     # Add UI URL for web interface integration
     if "data" in result:
         for term in result["data"]:
             term_fqn = term.get("fullyQualifiedName", "")
             if term_fqn:
                 term["ui_url"] = f"{client.host}/glossaryTerm/{term_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -249,10 +249,10 @@ async def get_glossary_term(
         params["fields"] = fields
 
     result = client.get(f"glossaryTerms/{term_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     term_fqn = result.get("fullyQualifiedName", "")
     if term_fqn:
         result["ui_url"] = f"{client.host}/glossaryTerm/{term_fqn}"
-    
-    return [types.TextContent(type="text", text=str(result))] 
+
+    return [types.TextContent(type="text", text=str(result))]

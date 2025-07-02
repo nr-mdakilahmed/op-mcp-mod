@@ -14,7 +14,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -57,14 +57,14 @@ async def list_topics(
         params["include"] = "all"
 
     result = client.get("topics", params=params)
-    
+
     # Add UI URL for web interface integration
     if "data" in result:
         for topic in result["data"]:
             topic_fqn = topic.get("fullyQualifiedName", "")
             if topic_fqn:
                 topic["ui_url"] = f"{client.host}/topic/{topic_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -87,12 +87,12 @@ async def get_topic(
         params["fields"] = fields
 
     result = client.get(f"topics/{topic_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     topic_fqn = result.get("fullyQualifiedName", "")
     if topic_fqn:
         result["ui_url"] = f"{client.host}/topic/{topic_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -115,12 +115,12 @@ async def get_topic_by_name(
         params["fields"] = fields
 
     result = client.get(f"topics/name/{fqn}", params=params)
-    
+
     # Add UI URL for web interface integration
     topic_fqn = result.get("fullyQualifiedName", "")
     if topic_fqn:
         result["ui_url"] = f"{client.host}/topic/{topic_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -137,12 +137,12 @@ async def create_topic(
     """
     client = get_client()
     result = client.post("topics", json_data=topic_data)
-    
+
     # Add UI URL for web interface integration
     topic_fqn = result.get("fullyQualifiedName", "")
     if topic_fqn:
         result["ui_url"] = f"{client.host}/topic/{topic_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -161,12 +161,12 @@ async def update_topic(
     """
     client = get_client()
     result = client.put(f"topics/{topic_id}", json_data=topic_data)
-    
+
     # Add UI URL for web interface integration
     topic_fqn = result.get("fullyQualifiedName", "")
     if topic_fqn:
         result["ui_url"] = f"{client.host}/topic/{topic_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -188,5 +188,5 @@ async def delete_topic(
     client = get_client()
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"topics/{topic_id}", params=params)
-    
-    return [types.TextContent(type="text", text=f"Topic {topic_id} deleted successfully")] 
+
+    return [types.TextContent(type="text", text=f"Topic {topic_id} deleted successfully")]

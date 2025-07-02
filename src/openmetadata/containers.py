@@ -14,7 +14,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -57,14 +57,14 @@ async def list_containers(
         params["include"] = "all"
 
     result = client.get("containers", params=params)
-    
+
     # Add UI URL for web interface integration
     if "data" in result:
         for container in result["data"]:
             container_fqn = container.get("fullyQualifiedName", "")
             if container_fqn:
                 container["ui_url"] = f"{client.host}/container/{container_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -87,12 +87,12 @@ async def get_container(
         params["fields"] = fields
 
     result = client.get(f"containers/{container_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     container_fqn = result.get("fullyQualifiedName", "")
     if container_fqn:
         result["ui_url"] = f"{client.host}/container/{container_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -115,12 +115,12 @@ async def get_container_by_name(
         params["fields"] = fields
 
     result = client.get(f"containers/name/{fqn}", params=params)
-    
+
     # Add UI URL for web interface integration
     container_fqn = result.get("fullyQualifiedName", "")
     if container_fqn:
         result["ui_url"] = f"{client.host}/container/{container_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -137,12 +137,12 @@ async def create_container(
     """
     client = get_client()
     result = client.post("containers", json_data=container_data)
-    
+
     # Add UI URL for web interface integration
     container_fqn = result.get("fullyQualifiedName", "")
     if container_fqn:
         result["ui_url"] = f"{client.host}/container/{container_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -161,12 +161,12 @@ async def update_container(
     """
     client = get_client()
     result = client.put(f"containers/{container_id}", json_data=container_data)
-    
+
     # Add UI URL for web interface integration
     container_fqn = result.get("fullyQualifiedName", "")
     if container_fqn:
         result["ui_url"] = f"{client.host}/container/{container_fqn}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -188,5 +188,5 @@ async def delete_container(
     client = get_client()
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"containers/{container_id}", params=params)
-    
-    return [types.TextContent(type="text", text=f"Container {container_id} deleted successfully")] 
+
+    return [types.TextContent(type="text", text=f"Container {container_id} deleted successfully")]

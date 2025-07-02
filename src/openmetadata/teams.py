@@ -14,7 +14,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -57,14 +57,14 @@ async def list_teams(
         params["include"] = "all"
 
     result = client.get("teams", params=params)
-    
+
     # Add UI URL for web interface integration
     if "data" in result:
         for team in result["data"]:
             team_name = team.get("name", "")
             if team_name:
                 team["ui_url"] = f"{client.host}/team/{team_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -87,12 +87,12 @@ async def get_team(
         params["fields"] = fields
 
     result = client.get(f"teams/{team_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     team_name = result.get("name", "")
     if team_name:
         result["ui_url"] = f"{client.host}/team/{team_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -115,12 +115,12 @@ async def get_team_by_name(
         params["fields"] = fields
 
     result = client.get(f"teams/name/{name}", params=params)
-    
+
     # Add UI URL for web interface integration
     team_name = result.get("name", "")
     if team_name:
         result["ui_url"] = f"{client.host}/team/{team_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -137,12 +137,12 @@ async def create_team(
     """
     client = get_client()
     result = client.post("teams", json_data=team_data)
-    
+
     # Add UI URL for web interface integration
     team_name = result.get("name", "")
     if team_name:
         result["ui_url"] = f"{client.host}/team/{team_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -161,12 +161,12 @@ async def update_team(
     """
     client = get_client()
     result = client.put(f"teams/{team_id}", json_data=team_data)
-    
+
     # Add UI URL for web interface integration
     team_name = result.get("name", "")
     if team_name:
         result["ui_url"] = f"{client.host}/team/{team_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -188,5 +188,5 @@ async def delete_team(
     client = get_client()
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"teams/{team_id}", params=params)
-    
-    return [types.TextContent(type="text", text=f"Team {team_id} deleted successfully")] 
+
+    return [types.TextContent(type="text", text=f"Team {team_id} deleted successfully")]

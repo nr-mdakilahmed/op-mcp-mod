@@ -14,7 +14,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -50,7 +50,7 @@ async def get_usage_by_entity(
         params["endTs"] = end_ts
 
     result = client.get(f"usage/{entity_type}/{entity_id}", params=params)
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -67,7 +67,7 @@ async def add_usage_data(
     """
     client = get_client()
     result = client.post("usage", json_data=usage_data)
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -94,5 +94,5 @@ async def get_entity_usage_summary(
         params["endTs"] = end_ts
 
     result = client.get("usage/summary", params=params)
-    
-    return [types.TextContent(type="text", text=str(result))] 
+
+    return [types.TextContent(type="text", text=str(result))]

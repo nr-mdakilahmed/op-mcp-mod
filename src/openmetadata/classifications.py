@@ -14,12 +14,16 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
     return [
-        (list_classifications, "list_classifications", "List classifications from OpenMetadata with pagination and filtering"),
+        (
+            list_classifications,
+            "list_classifications",
+            "List classifications from OpenMetadata with pagination and filtering",
+        ),
         (get_classification, "get_classification", "Get details of a specific classification by ID"),
         (get_classification_by_name, "get_classification_by_name", "Get details of a specific classification by name"),
         (create_classification, "create_classification", "Create a new classification in OpenMetadata"),
@@ -53,14 +57,14 @@ async def list_classifications(
         params["include"] = "all"
 
     result = client.get("classifications", params=params)
-    
+
     # Add UI URL for web interface integration
     if "data" in result:
         for classification in result["data"]:
             classification_name = classification.get("name", "")
             if classification_name:
                 classification["ui_url"] = f"{client.host}/classification/{classification_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -83,12 +87,12 @@ async def get_classification(
         params["fields"] = fields
 
     result = client.get(f"classifications/{classification_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     classification_name = result.get("name", "")
     if classification_name:
         result["ui_url"] = f"{client.host}/classification/{classification_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -111,12 +115,12 @@ async def get_classification_by_name(
         params["fields"] = fields
 
     result = client.get(f"classifications/name/{name}", params=params)
-    
+
     # Add UI URL for web interface integration
     classification_name = result.get("name", "")
     if classification_name:
         result["ui_url"] = f"{client.host}/classification/{classification_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -133,12 +137,12 @@ async def create_classification(
     """
     client = get_client()
     result = client.post("classifications", json_data=classification_data)
-    
+
     # Add UI URL for web interface integration
     classification_name = result.get("name", "")
     if classification_name:
         result["ui_url"] = f"{client.host}/classification/{classification_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -157,12 +161,12 @@ async def update_classification(
     """
     client = get_client()
     result = client.put(f"classifications/{classification_id}", json_data=classification_data)
-    
+
     # Add UI URL for web interface integration
     classification_name = result.get("name", "")
     if classification_name:
         result["ui_url"] = f"{client.host}/classification/{classification_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -184,5 +188,5 @@ async def delete_classification(
     client = get_client()
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"classifications/{classification_id}", params=params)
-    
-    return [types.TextContent(type="text", text=f"Classification {classification_id} deleted successfully")] 
+
+    return [types.TextContent(type="text", text=f"Classification {classification_id} deleted successfully")]

@@ -14,7 +14,7 @@ from src.openmetadata.openmetadata_client import get_client
 
 def get_all_functions() -> List[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
-    
+
     Returns:
         List of tuples containing function reference, tool name, and description
     """
@@ -57,14 +57,14 @@ async def list_users(
         params["include"] = "all"
 
     result = client.get("users", params=params)
-    
+
     # Add UI URL for web interface integration
     if "data" in result:
         for user in result["data"]:
             user_name = user.get("name", "")
             if user_name:
                 user["ui_url"] = f"{client.host}/user/{user_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -87,12 +87,12 @@ async def get_user(
         params["fields"] = fields
 
     result = client.get(f"users/{user_id}", params=params)
-    
+
     # Add UI URL for web interface integration
     user_name = result.get("name", "")
     if user_name:
         result["ui_url"] = f"{client.host}/user/{user_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -115,12 +115,12 @@ async def get_user_by_name(
         params["fields"] = fields
 
     result = client.get(f"users/name/{name}", params=params)
-    
+
     # Add UI URL for web interface integration
     user_name = result.get("name", "")
     if user_name:
         result["ui_url"] = f"{client.host}/user/{user_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -137,12 +137,12 @@ async def create_user(
     """
     client = get_client()
     result = client.post("users", json_data=user_data)
-    
+
     # Add UI URL for web interface integration
     user_name = result.get("name", "")
     if user_name:
         result["ui_url"] = f"{client.host}/user/{user_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -161,12 +161,12 @@ async def update_user(
     """
     client = get_client()
     result = client.put(f"users/{user_id}", json_data=user_data)
-    
+
     # Add UI URL for web interface integration
     user_name = result.get("name", "")
     if user_name:
         result["ui_url"] = f"{client.host}/user/{user_name}"
-    
+
     return [types.TextContent(type="text", text=str(result))]
 
 
@@ -188,5 +188,5 @@ async def delete_user(
     client = get_client()
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"users/{user_id}", params=params)
-    
-    return [types.TextContent(type="text", text=f"User {user_id} deleted successfully")] 
+
+    return [types.TextContent(type="text", text=f"User {user_id} deleted successfully")]
