@@ -1,6 +1,6 @@
 [project]
 name = "mcp-server-openmetadata"
-version = "0.1.0"
+version = "0.2.0"
 description = "Model Context Protocol (MCP) server for OpenMetadata"
 authors = [
     { name = "Gyeongmo Yang", email = "me@gmyang.dev" }
