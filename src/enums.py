@@ -16,6 +16,8 @@ class APIType(str, Enum):
     TOPIC = "topic"
     METRICS = "metrics"
     CONTAINER = "container"
+    REPORT = "report"
+    ML_MODEL = "mlmodel"
 
     # Users & Teams
     USER = "user"
@@ -24,31 +26,38 @@ class APIType(str, Enum):
     # Governance & Classification
     CLASSIFICATION = "classification"
     GLOSSARY = "glossary"
+    TAG = "tag"
 
     # System & Operations
     BOT = "bot"
+    SERVICES = "services"
+    EVENT = "event"
 
     # Analytics & Monitoring
     LINEAGE = "lineage"
     USAGE = "usage"
+    SEARCH = "search"
 
-    # Additional API groups available in OpenMetadata (not yet implemented)
-    API_COLLECTION = "apicollection"
-    API_ENDPOINT = "apiendpoint"
-    APP = "app"
-    DATA_PRODUCT = "dataproduct"
-    DOC_STORE = "docstore"
-    DOMAIN = "domain"
-    EVENT = "event"
-    FEED = "feed"
-    ML_MODEL = "mlmodel"
-    PERMISSION = "permission"
-    PERSONA = "persona"
+    # Data Quality
+    TEST_CASE = "test_case"
+    TEST_SUITE = "test_suite"
+
+    # Access Control & Security
     POLICY = "policy"
-    QUERY = "query"
-    REPORT = "report"
     ROLE = "role"
-    SEARCH_INDEX = "searchindex"
-    STORED_PROCEDURE = "storedprocedure"
-    SUGGESTION = "suggestion"
-    TAG = "tag"
+
+    # Domain Management
+    DOMAIN = "domain"
+
+    # Not Yet Implemented - Future Expansion
+    # These are placeholder values for future implementation
+    # API_COLLECTION = "api_collection"
+    # API_ENDPOINT = "api_endpoint"
+    # APP = "app"
+    # FEED = "feed"
+    # PERSONA = "persona"
+    # QUERY = "query"
+    # SEARCH_INDEX = "search_index"
+    # STORED_PROCEDURE = "stored_procedure"
+    # SUGGESTION = "suggestion"
+    # WEBHOOK = "webhook"

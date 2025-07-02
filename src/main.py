@@ -17,7 +17,8 @@ from src.enums import APIType
 from src.openmetadata import (
     database, schema, table, dashboards, charts, pipelines, 
     topics, containers, metrics, users, teams, classifications, 
-    glossary, bots, lineage, usage
+    glossary, bots, lineage, usage, search, services, reports, mlmodels,
+    test_cases, test_suites, events, policies, roles, tags, domains
 )
 from src.openmetadata.openmetadata_client import initialize_client
 from src.server import get_server_runner
@@ -33,20 +34,33 @@ APITYPE_TO_FUNCTIONS = {
     APIType.CHART: charts.get_all_functions,
     APIType.PIPELINE: pipelines.get_all_functions,
     APIType.TOPIC: topics.get_all_functions,
-    APIType.CONTAINER: containers.get_all_functions,
     APIType.METRICS: metrics.get_all_functions,
+    APIType.CONTAINER: containers.get_all_functions,
+    APIType.REPORT: reports.get_all_functions,
+    APIType.ML_MODEL: mlmodels.get_all_functions,
     # Users & Teams
     APIType.USER: users.get_all_functions,
     APIType.TEAM: teams.get_all_functions,
     # Governance & Classification
     APIType.CLASSIFICATION: classifications.get_all_functions,
     APIType.GLOSSARY: glossary.get_all_functions,
+    APIType.TAG: tags.get_all_functions,
     # System & Operations
     APIType.BOT: bots.get_all_functions,
+    APIType.SERVICES: services.get_all_functions,
+    APIType.EVENT: events.get_all_functions,
     # Analytics & Monitoring
     APIType.LINEAGE: lineage.get_all_functions,
     APIType.USAGE: usage.get_all_functions,
-    # Additional API types will be added here as modules are implemented
+    APIType.SEARCH: search.get_all_functions,
+    # Data Quality
+    APIType.TEST_CASE: test_cases.get_all_functions,
+    APIType.TEST_SUITE: test_suites.get_all_functions,
+    # Access Control & Security
+    APIType.POLICY: policies.get_all_functions,
+    APIType.ROLE: roles.get_all_functions,
+    # Domain Management
+    APIType.DOMAIN: domains.get_all_functions,
 }
 
 DEFAULT_PORT = 8000
@@ -86,6 +100,10 @@ SERVER_NAME = "mcp-server-openmetadata"
         APIType.BOT.value,
         APIType.LINEAGE.value,
         APIType.USAGE.value,
+        APIType.SEARCH.value,
+        APIType.SERVICES.value,
+        APIType.REPORT.value,
+        APIType.ML_MODEL.value,
     ],  # Default to all implemented APIs
     multiple=True,
     help="API groups to enable (default: core entities and common assets)",
