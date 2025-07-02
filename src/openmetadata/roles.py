@@ -49,7 +49,7 @@ async def list_roles(
     """
     client = get_client()
     params = {"limit": min(max(1, limit), 1000000), "offset": max(0, offset)}
-    
+
     if fields:
         params["fields"] = fields
     if include_deleted:
@@ -198,4 +198,4 @@ async def delete_role(
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"roles/{role_id}", params=params)
 
-    return [types.TextContent(type="text", text=f"Role {role_id} deleted successfully")] 
+    return [types.TextContent(type="text", text=f"Role {role_id} deleted successfully")]

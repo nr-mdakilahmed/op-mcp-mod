@@ -385,4 +385,4 @@ async def test_connection(
     client = get_client()
     result = client.post("services/testConnection", json_data=connection_data)
 
-    return [types.TextContent(type="text", text=str(result))] 
+    return [types.TextContent(type="text", text=str(result))]

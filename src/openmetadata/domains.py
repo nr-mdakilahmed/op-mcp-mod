@@ -55,7 +55,7 @@ async def list_domains(
     """
     client = get_client()
     params = {"limit": min(max(1, limit), 1000000), "offset": max(0, offset)}
-    
+
     if fields:
         params["fields"] = fields
     if include_deleted:
@@ -230,7 +230,7 @@ async def list_data_products(
     """
     client = get_client()
     params = {"limit": min(max(1, limit), 1000000), "offset": max(0, offset)}
-    
+
     if fields:
         params["fields"] = fields
     if domain:
@@ -381,4 +381,4 @@ async def delete_data_product(
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"dataProducts/{data_product_id}", params=params)
 
-    return [types.TextContent(type="text", text=f"Data product {data_product_id} deleted successfully")] 
+    return [types.TextContent(type="text", text=f"Data product {data_product_id} deleted successfully")]

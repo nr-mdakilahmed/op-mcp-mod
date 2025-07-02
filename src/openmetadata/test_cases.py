@@ -30,7 +30,7 @@ def get_all_functions() -> List[tuple[Callable, str, str]]:
     ]
 
 
-async def list_test_cases(
+async def list_test_cases(  # noqa: C901
     limit: int = 10,
     offset: int = 0,
     fields: Optional[str] = None,
@@ -59,7 +59,7 @@ async def list_test_cases(
     """
     client = get_client()
     params = {"limit": min(max(1, limit), 1000000), "offset": max(0, offset)}
-    
+
     if fields:
         params["fields"] = fields
     if entity_link:
@@ -240,7 +240,7 @@ async def list_test_case_results(
     """
     client = get_client()
     params = {"limit": min(max(1, limit), 1000000), "offset": max(0, offset)}
-    
+
     if start_ts:
         params["startTs"] = start_ts
     if end_ts:
@@ -268,7 +268,7 @@ async def get_test_case_results_by_name(
     """
     client = get_client()
     params = {}
-    
+
     if start_ts:
         params["startTs"] = start_ts
     if end_ts:
@@ -276,4 +276,4 @@ async def get_test_case_results_by_name(
 
     result = client.get(f"dataQuality/testCases/testCaseResults/{fqn}", params=params)
 
-    return [types.TextContent(type="text", text=str(result))] 
+    return [types.TextContent(type="text", text=str(result))]

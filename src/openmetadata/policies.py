@@ -53,7 +53,7 @@ async def list_policies(
     """
     client = get_client()
     params = {"limit": min(max(1, limit), 1000000), "offset": max(0, offset)}
-    
+
     if fields:
         params["fields"] = fields
     if policy_type:
@@ -224,8 +224,7 @@ async def validate_policy(
     return [types.TextContent(type="text", text=str(result))]
 
 
-async def list_policy_resources(
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+async def list_policy_resources() -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
     """List available resources for policy creation.
 
     Returns:
@@ -234,4 +233,4 @@ async def list_policy_resources(
     client = get_client()
     result = client.get("policies/resources")
 
-    return [types.TextContent(type="text", text=str(result))] 
+    return [types.TextContent(type="text", text=str(result))]

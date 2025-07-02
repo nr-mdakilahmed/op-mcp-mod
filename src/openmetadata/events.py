@@ -57,7 +57,7 @@ async def list_events(
     """
     client = get_client()
     params = {"limit": min(max(1, limit), 1000000), "offset": max(0, offset)}
-    
+
     if entity_type:
         params["entityType"] = entity_type
     if entity_id:
@@ -93,7 +93,7 @@ async def list_event_subscriptions(
     """
     client = get_client()
     params = {"limit": min(max(1, limit), 1000000), "offset": max(0, offset)}
-    
+
     if fields:
         params["fields"] = fields
     if include_deleted:
@@ -289,4 +289,4 @@ async def get_subscription_status(
     client = get_client()
     result = client.get(f"events/subscriptions/name/{subscription_name}/status/{destination_id}")
 
-    return [types.TextContent(type="text", text=str(result))] 
+    return [types.TextContent(type="text", text=str(result))]
