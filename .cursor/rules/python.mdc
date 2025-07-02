@@ -43,8 +43,9 @@ Follow these ruff settings for consistent style:
 
 ## Code Structure
 - **Put constants (strings, string templates, etc.) at the top of the file** after imports.
+- **Always use absolute imports** - never use relative imports (e.g., use `from src.module import Class` not `from .module import Class`).
 - Import standard library modules first, then third-party, then local imports.
-- **Caller should come before callee** - define functions after they are called.
+- **Caller should come before callee** - define functions before they are called.
 - Use docstrings for functions and classes following PEP 257.
 - Keep functions small and focused on a single responsibility.
 - Use meaningful function and variable names that explain intent.
@@ -57,3 +58,28 @@ Follow these ruff settings for consistent style:
 - Use `zip()` for parallel iteration.
 - Prefer `pathlib` over `os.path` for file operations.
 - Use context managers for resource cleanup.
+
+# Python Coding Guidelines
+
+## Import Rules
+- Use absolute imports only, no relative imports (e.g., `from src.module import Class` not `from .module import Class`)
+- Group imports in this order: standard library, third-party, local application imports
+- Use specific imports rather than wildcard imports
+
+## Function Ordering
+- Functions must be defined before they are called
+- Place helper functions and `get_all_functions()` at the top of modules before async function definitions
+
+## __init__.py Files
+- `__init__.py` files should only contain docstrings (no imports or `__all__` declarations)
+- Provide clear package-level documentation
+
+## Type Hints
+- Always use type hints for function parameters and return types
+- Use `Optional[Type]` for nullable parameters
+- Import typing components explicitly
+
+## Documentation
+- Update docstrings and comments when modifying code
+- Include comprehensive function documentation with Args and Returns sections
+- Document complex logic and design decisions
