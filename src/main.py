@@ -5,174 +5,162 @@ dynamically loads and registers API modules based on user selection,
 and manages server lifecycle with chosen transport protocol.
 """
 
+import logging
 from typing import List
 
 import click
-from fastmcp import FastMCP
 
-from src.config import Config
 from src.enums import APIType
 
-# Import API modules
-from src.openmetadata import (
-    bots,
-    charts,
-    classifications,
-    containers,
-    dashboards,
-    database,
-    domains,
-    events,
-    glossary,
-    lineage,
-    metrics,
-    mlmodels,
-    pipelines,
-    policies,
-    reports,
-    roles,
-    schema,
-    search,
-    services,
-    table,
-    tags,
-    teams,
-    test_cases,
-    test_suites,
-    topics,
-    usage,
-    users,
-)
-from src.openmetadata.openmetadata_client import initialize_client
-from src.server import get_server_runner
+# Import API modules with explicit aliases
+from src.openmetadata.bots import get_all_functions as get_bots_functions
+from src.openmetadata.charts import get_all_functions as get_charts_functions
+from src.openmetadata.classifications import get_all_functions as get_classifications_functions
+from src.openmetadata.containers import get_all_functions as get_containers_functions
+from src.openmetadata.dashboards import get_all_functions as get_dashboards_functions
+from src.openmetadata.database import get_all_functions as get_database_functions
+from src.openmetadata.domains import get_all_functions as get_domains_functions
+from src.openmetadata.events import get_all_functions as get_events_functions
+from src.openmetadata.glossary import get_all_functions as get_glossary_functions
+from src.openmetadata.lineage import get_all_functions as get_lineage_functions
+from src.openmetadata.metrics import get_all_functions as get_metrics_functions
+from src.openmetadata.mlmodels import get_all_functions as get_mlmodels_functions
+from src.openmetadata.pipelines import get_all_functions as get_pipelines_functions
+from src.openmetadata.policies import get_all_functions as get_policies_functions
+from src.openmetadata.reports import get_all_functions as get_reports_functions
+from src.openmetadata.roles import get_all_functions as get_roles_functions
+from src.openmetadata.schema import get_all_functions as get_schema_functions
+from src.openmetadata.search import get_all_functions as get_search_functions
+from src.openmetadata.services import get_all_functions as get_services_functions
+from src.openmetadata.table import get_all_functions as get_table_functions
+from src.openmetadata.tags import get_all_functions as get_tags_functions
+from src.openmetadata.teams import get_all_functions as get_teams_functions
+from src.openmetadata.test_cases import get_all_functions as get_test_cases_functions
+from src.openmetadata.test_suites import get_all_functions as get_test_suites_functions
+from src.openmetadata.topics import get_all_functions as get_topics_functions
+from src.openmetadata.usage import get_all_functions as get_usage_functions
+from src.openmetadata.users import get_all_functions as get_users_functions
 
 # Map API types to their respective function collections
 APITYPE_TO_FUNCTIONS = {
     # Core Data Entities
-    APIType.TABLE: table.get_all_functions,
-    APIType.DATABASE: database.get_all_functions,
-    APIType.SCHEMA: schema.get_all_functions,
+    APIType.TABLE: get_table_functions,
+    APIType.DATABASE: get_database_functions,
+    APIType.SCHEMA: get_schema_functions,
     # Data Assets
-    APIType.DASHBOARD: dashboards.get_all_functions,
-    APIType.CHART: charts.get_all_functions,
-    APIType.PIPELINE: pipelines.get_all_functions,
-    APIType.TOPIC: topics.get_all_functions,
-    APIType.METRICS: metrics.get_all_functions,
-    APIType.CONTAINER: containers.get_all_functions,
-    APIType.REPORT: reports.get_all_functions,
-    APIType.ML_MODEL: mlmodels.get_all_functions,
+    APIType.DASHBOARD: get_dashboards_functions,
+    APIType.CHART: get_charts_functions,
+    APIType.PIPELINE: get_pipelines_functions,
+    APIType.TOPIC: get_topics_functions,
+    APIType.METRICS: get_metrics_functions,
+    APIType.CONTAINER: get_containers_functions,
+    APIType.REPORT: get_reports_functions,
+    APIType.ML_MODEL: get_mlmodels_functions,
     # Users & Teams
-    APIType.USER: users.get_all_functions,
-    APIType.TEAM: teams.get_all_functions,
+    APIType.USER: get_users_functions,
+    APIType.TEAM: get_teams_functions,
     # Governance & Classification
-    APIType.CLASSIFICATION: classifications.get_all_functions,
-    APIType.GLOSSARY: glossary.get_all_functions,
-    APIType.TAG: tags.get_all_functions,
+    APIType.CLASSIFICATION: get_classifications_functions,
+    APIType.GLOSSARY: get_glossary_functions,
+    APIType.TAG: get_tags_functions,
     # System & Operations
-    APIType.BOT: bots.get_all_functions,
-    APIType.SERVICES: services.get_all_functions,
-    APIType.EVENT: events.get_all_functions,
+    APIType.BOT: get_bots_functions,
+    APIType.SERVICES: get_services_functions,
+    APIType.EVENT: get_events_functions,
     # Analytics & Monitoring
-    APIType.LINEAGE: lineage.get_all_functions,
-    APIType.USAGE: usage.get_all_functions,
-    APIType.SEARCH: search.get_all_functions,
+    APIType.LINEAGE: get_lineage_functions,
+    APIType.USAGE: get_usage_functions,
+    APIType.SEARCH: get_search_functions,
     # Data Quality
-    APIType.TEST_CASE: test_cases.get_all_functions,
-    APIType.TEST_SUITE: test_suites.get_all_functions,
+    APIType.TEST_CASE: get_test_cases_functions,
+    APIType.TEST_SUITE: get_test_suites_functions,
     # Access Control & Security
-    APIType.POLICY: policies.get_all_functions,
-    APIType.ROLE: roles.get_all_functions,
+    APIType.POLICY: get_policies_functions,
+    APIType.ROLE: get_roles_functions,
     # Domain Management
-    APIType.DOMAIN: domains.get_all_functions,
+    APIType.DOMAIN: get_domains_functions,
 }
 
-DEFAULT_PORT = 8000
-DEFAULT_TRANSPORT = "stdio"
-SERVER_NAME = "mcp-server-openmetadata"
+
+def filter_functions_for_read_only(functions: list[tuple]) -> list[tuple]:
+    """
+    Filter functions to only include read-only operations.
+
+    Args:
+        functions: List of (func, name, description, is_read_only) tuples
+
+    Returns:
+        List of (func, name, description, is_read_only) tuples with only read-only functions
+    """
+    return [
+        (func, name, description, is_read_only) for func, name, description, is_read_only in functions if is_read_only
+    ]
 
 
 @click.command()
 @click.option(
     "--transport",
     type=click.Choice(["stdio", "sse"]),
-    default=DEFAULT_TRANSPORT,
+    default="stdio",
     help="Transport type for MCP communication",
-)
-@click.option(
-    "--port",
-    default=DEFAULT_PORT,
-    help="Port to listen on for SSE transport",
 )
 @click.option(
     "--apis",
     type=click.Choice([api.value for api in APIType]),
-    default=[
-        APIType.TABLE.value,
-        APIType.DATABASE.value,
-        APIType.SCHEMA.value,
-        APIType.DASHBOARD.value,
-        APIType.CHART.value,
-        APIType.PIPELINE.value,
-        APIType.TOPIC.value,
-        APIType.METRICS.value,
-        APIType.CONTAINER.value,
-        APIType.USER.value,
-        APIType.TEAM.value,
-        APIType.CLASSIFICATION.value,
-        APIType.GLOSSARY.value,
-        APIType.BOT.value,
-        APIType.LINEAGE.value,
-        APIType.USAGE.value,
-        APIType.SEARCH.value,
-        APIType.SERVICES.value,
-        APIType.REPORT.value,
-        APIType.ML_MODEL.value,
-    ],  # Default to all implemented APIs
+    default=[api.value for api in APIType],
     multiple=True,
     help="API groups to enable (default: core entities and common assets)",
 )
-def main(transport: str, port: int, apis: List[str]) -> int:
+@click.option(
+    "--read-only",
+    is_flag=True,
+    help="Only expose read-only tools (GET operations, no CREATE/UPDATE/DELETE)",
+)
+def main(transport: str, apis: List[str], read_only: bool) -> None:
     """Start the MCP OpenMetadata server with selected API groups."""
-    try:
-        # Get OpenMetadata credentials from environment
-        config = Config.from_env()
+    from src.config import Config
+    from src.openmetadata.openmetadata_client import initialize_client
+    from src.server import app
 
-        # Initialize global OpenMetadata client
-        initialize_client(
-            host=config.OPENMETADATA_HOST,
-            api_token=config.OPENMETADATA_JWT_TOKEN,
-            username=config.OPENMETADATA_USERNAME,
-            password=config.OPENMETADATA_PASSWORD,
-        )
+    # Get OpenMetadata credentials from environment
+    config = Config.from_env()
 
-        # Create FastMCP server
-        app = FastMCP(SERVER_NAME)
+    # Initialize global OpenMetadata client
+    initialize_client(
+        host=config.OPENMETADATA_HOST,
+        api_token=config.OPENMETADATA_JWT_TOKEN,
+        username=config.OPENMETADATA_USERNAME,
+        password=config.OPENMETADATA_PASSWORD,
+    )
 
-        # Register selected API modules
-        registered_count = 0
-        for api in apis:
-            api_type = APIType(api)
-            if api_type in APITYPE_TO_FUNCTIONS:
-                get_functions = APITYPE_TO_FUNCTIONS[api_type]
-                functions = get_functions()
+    registered_count = 0
+    for api in apis:
+        logging.debug(f"Adding API: {api}")
+        get_function = APITYPE_TO_FUNCTIONS[APIType(api)]
+        try:
+            functions = get_function()
+        except NotImplementedError:
+            logging.warning(f"API type '{api}' not implemented yet")
+            continue
 
-                for func, name, description in functions:
-                    app.add_tool(func, name=name, description=description)
-                    registered_count += 1
+        # Filter functions for read-only mode if requested
+        if read_only:
+            functions = filter_functions_for_read_only(functions)
 
-                print(f"Registered {len(functions)} tools from {api_type.value} API")
-            else:
-                print(f"Warning: API type '{api}' not implemented yet")
+        for func, name, description, *_ in functions:
+            app.add_tool(func, name=name, description=description)
+            registered_count += 1
 
-        print(f"Total registered tools: {registered_count}")
+        logging.info(f"Registered {len(functions)} tools from {api} API")
 
-        # Start server with selected transport
-        server_runner = get_server_runner(app, transport, port=port)
-        return server_runner()
+    logging.info(f"Total registered tools: {registered_count}")
 
-    except Exception as e:
-        print(f"Server failed to start: {str(e)}")
-        return 1
+    if transport == "sse":
+        logging.debug("Starting MCP server for OpenMetadata with SSE transport")
+        app.run(transport="sse")
+    else:
+        logging.debug("Starting MCP server for OpenMetadata with stdio transport")
+        app.run(transport="stdio")
 
 
 if __name__ == "__main__":
