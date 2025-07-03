@@ -1,10 +1,8 @@
 [project]
 name = "mcp-server-openmetadata"
-version = "0.2.0"
+version = "0.2.1"
 description = "Model Context Protocol (MCP) server for OpenMetadata"
-authors = [
-    { name = "Gyeongmo Yang", email = "me@gmyang.dev" }
-]
+authors = [{ name = "Gyeongmo Yang", email = "me@yanggyeongmo.com" }]
 dependencies = [
     "httpx>=0.24.1",
     "click>=8.1.7",
@@ -28,11 +26,7 @@ classifiers = [
 keywords = ["mcp", "openmetadata", "metadata", "model-context-protocol"]
 
 [project.optional-dependencies]
-dev = [
-    "build>=1.2.2.post1",
-    "twine>=6.1.0",
-    "ruff>=0.2.1",
-]
+dev = ["build>=1.2.2.post1", "twine>=6.1.0", "ruff>=0.2.1"]
 
 [project.urls]
 Homepage = "https://github.com/yangkyeongmo/mcp-server-openmetadata"
@@ -48,34 +42,22 @@ mcp-server-openmetadata = "src.main:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
-exclude = [
-    "**/__pycache__",
-    "**/*.py[cod]",
-    "**/*.so",
-]
+exclude = ["**/__pycache__", "**/*.py[cod]", "**/*.so"]
 
 [tool.hatch.build]
-include = [
-    "src/**/*.py",
-    "README.md",
-    "LICENSE",
-]
-exclude = [
-    "**/__pycache__",
-    "**/*.py[cod]",
-    "**/*.so",
-]
+include = ["src/**/*.py", "README.md", "LICENSE"]
+exclude = ["**/__pycache__", "**/*.py[cod]", "**/*.so"]
 
 [tool.ruff]
 line-length = 120
 target-version = "py310"
 select = [
-    "E",  # pycodestyle errors
-    "W",  # pycodestyle warnings
-    "F",  # pyflakes
-    "I",  # isort
-    "C",  # flake8-comprehensions
-    "B",  # flake8-bugbear
+    "E", # pycodestyle errors
+    "W", # pycodestyle warnings
+    "F", # pyflakes
+    "I", # isort
+    "C", # flake8-comprehensions
+    "B", # flake8-bugbear
 ]
 
 [tool.ruff.isort]
@@ -87,6 +69,4 @@ force-sort-within-sections = true
 "__init__.py" = ["F401"]
 
 [dependency-groups]
-dev = [
-    "ruff>=0.9.6",
-]
+dev = ["ruff>=0.9.6"]
