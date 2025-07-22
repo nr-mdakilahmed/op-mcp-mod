@@ -37,4 +37,16 @@ ENV PATH="/app/.venv/bin:$PATH"
 ENV OPENMETADATA_HOST=""
 ENV OPENMETADATA_JWT_TOKEN=""
 
-ENTRYPOINT ["python", "src/server.py"]
+# Create a non-root user to run the server
+RUN groupadd -r app && useradd -r -g app app
+USER app
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8000/health || exit 1
+
+# Expose the HTTP port
+EXPOSE 8000
+
+# Start with optimized settings
+ENTRYPOINT ["python", "-m", "src.main", "--transport", "http", "--host", "0.0.0.0", "--port", "8000"]

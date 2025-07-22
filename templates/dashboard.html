@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP OpenMetadata Server Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        .stat-card h3 {
+            margin: 0 0 0.5rem 0;
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        .tools-section {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        .tools-section h2 {
+            margin: 0 0 1rem 0;
+            color: #333;
+        }
+        .api-endpoints {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .endpoint {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #eee;
+        }
+        .endpoint:last-child {
+            border-bottom: none;
+        }
+        .method {
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 1rem;
+            min-width: 60px;
+            text-align: center;
+        }
+        .method.get { background: #d4edda; color: #155724; }
+        .method.post { background: #d1ecf1; color: #0c5460; }
+        .method.ws { background: #fff3cd; color: #856404; }
+        .endpoint-path {
+            flex: 1;
+            font-family: 'Courier New', monospace;
+            color: #666;
+        }
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        .status.online {
+            background: #d4edda;
+            color: #155724;
+        }
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .refresh-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+        .refresh-btn:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔗 MCP OpenMetadata Server</h1>
+        <p>Model Context Protocol Remote Server Dashboard</p>
+    </div>
+
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Available Tools</h3>
+                <div class="value">{{ tool_count }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Server Uptime</h3>
+                <div class="value" id="uptime">{{ "%.1f"|format(uptime) }}s</div>
+            </div>
+            <div class="stat-card">
+                <h3>OpenMetadata Status</h3>
+                <div class="value">
+                    <span class="status online">Connected</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>Transport Mode</h3>
+                <div class="value">HTTP + WebSocket</div>
+            </div>
+        </div>
+
+        <div class="tools-section">
+            <h2>🛠️ Available Tools</h2>
+            <p>This server provides {{ tool_count }} OpenMetadata tools via MCP protocol, including:</p>
+            <ul>
+                <li><strong>Table Management</strong> - Create, read, update, and delete database tables</li>
+                <li><strong>Database Operations</strong> - Manage databases and schemas</li>
+                <li><strong>Data Lineage</strong> - Track data flow and dependencies</li>
+                <li><strong>Glossary Management</strong> - Define and manage business terms</li>
+                <li><strong>Data Quality</strong> - Test cases and test suites</li>
+                <li><strong>User & Team Management</strong> - Access control and permissions</li>
+                <li><strong>Metrics & Analytics</strong> - Performance and usage tracking</li>
+                <li><strong>Classification & Tags</strong> - Data categorization and labeling</li>
+            </ul>
+            <button class="refresh-btn" onclick="location.reload()">🔄 Refresh Stats</button>
+        </div>
+
+        <div class="api-endpoints">
+            <h2>📡 API Endpoints</h2>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/health</span>
+                <span>Health check endpoint</span>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/auth/token</span>
+                <span>Authenticate and get access token</span>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/auth/google/login</span>
+                <span>Initiate Google OAuth login</span>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/auth/google/callback</span>
+                <span>Google OAuth callback endpoint</span>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/auth/google/redirect</span>
+                <span>Google OAuth login page</span>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/tools</span>
+                <span>List all available MCP tools</span>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <span class="endpoint-path">/tools/execute</span>
+                <span>Execute an MCP tool with parameters</span>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/stats</span>
+                <span>Get server statistics and metrics</span>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method ws">WS</span>
+                <span class="endpoint-path">/ws</span>
+                <span>WebSocket connection for real-time communication</span>
+            </div>
+            
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <span class="endpoint-path">/docs</span>
+                <span>Interactive API documentation (Swagger UI)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>MCP OpenMetadata Server - Built with FastAPI, Python, and ❤️ from NR Ingestion Team</p>
+        <p>Model Context Protocol enables seamless AI-to-tool communication</p>
+    </div>
+
+    <script>
+        // Update uptime every second
+        let startTime = Date.now() - {{ uptime * 1000 }};
+        setInterval(() => {
+            let uptimeSeconds = (Date.now() - startTime) / 1000;
+            let hours = Math.floor(uptimeSeconds / 3600);
+            let minutes = Math.floor((uptimeSeconds % 3600) / 60);
+            let seconds = Math.floor(uptimeSeconds % 60);
+            
+            let uptimeStr;
+            if (hours > 0) {
+                uptimeStr = `${hours}h ${minutes}m ${seconds}s`;
+            } else if (minutes > 0) {
+                uptimeStr = `${minutes}m ${seconds}s`;
+            } else {
+                uptimeStr = `${seconds}s`;
+            }
+            
+            document.getElementById('uptime').textContent = uptimeStr;
+        }, 1000);
+    </script>
+</body>
+</html>

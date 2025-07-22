@@ -6,13 +6,21 @@ and manages server lifecycle with chosen transport protocol.
 """
 
 import logging
-from typing import List
+import asyncio
 
 import click
+import uvicorn
+from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
 
+from src.config import Config
 from src.enums import APIType
+from src.monitoring import initialize_monitoring
+from src.openmetadata.openmetadata_client import initialize_client
+from src.server import app, register_tool
+from src.testing import run_interactive_testing
 
-# Import API modules with explicit aliases
+# Import all API module functions with descriptive aliases
 from src.openmetadata.bots import get_all_functions as get_bots_functions
 from src.openmetadata.charts import get_all_functions as get_charts_functions
 from src.openmetadata.classifications import get_all_functions as get_classifications_functions
@@ -41,13 +49,11 @@ from src.openmetadata.topics import get_all_functions as get_topics_functions
 from src.openmetadata.usage import get_all_functions as get_usage_functions
 from src.openmetadata.users import get_all_functions as get_users_functions
 
-# Map API types to their respective function collections
+# Mapping API types to their corresponding function getters
 APITYPE_TO_FUNCTIONS = {
-    # Core Data Entities
     APIType.TABLE: get_table_functions,
     APIType.DATABASE: get_database_functions,
     APIType.SCHEMA: get_schema_functions,
-    # Data Assets
     APIType.DASHBOARD: get_dashboards_functions,
     APIType.CHART: get_charts_functions,
     APIType.PIPELINE: get_pipelines_functions,
@@ -56,112 +62,294 @@ APITYPE_TO_FUNCTIONS = {
     APIType.CONTAINER: get_containers_functions,
     APIType.REPORT: get_reports_functions,
     APIType.ML_MODEL: get_mlmodels_functions,
-    # Users & Teams
     APIType.USER: get_users_functions,
     APIType.TEAM: get_teams_functions,
-    # Governance & Classification
     APIType.CLASSIFICATION: get_classifications_functions,
     APIType.GLOSSARY: get_glossary_functions,
     APIType.TAG: get_tags_functions,
-    # System & Operations
     APIType.BOT: get_bots_functions,
     APIType.SERVICES: get_services_functions,
     APIType.EVENT: get_events_functions,
-    # Analytics & Monitoring
     APIType.LINEAGE: get_lineage_functions,
     APIType.USAGE: get_usage_functions,
     APIType.SEARCH: get_search_functions,
-    # Data Quality
     APIType.TEST_CASE: get_test_cases_functions,
     APIType.TEST_SUITE: get_test_suites_functions,
-    # Access Control & Security
     APIType.POLICY: get_policies_functions,
     APIType.ROLE: get_roles_functions,
-    # Domain Management
     APIType.DOMAIN: get_domains_functions,
 }
 
 
-def filter_functions_for_read_only(functions: list[tuple]) -> list[tuple]:
-    """
-    Filter functions to only include read-only operations.
-
+def filter_functions_for_read_only(functions):
+    """Filter out write operations for read-only mode.
+    
     Args:
-        functions: List of (func, name, description, is_read_only) tuples
-
+        functions: List of function tuples (func, name, description, ...)
+        
     Returns:
-        List of (func, name, description, is_read_only) tuples with only read-only functions
+        Filtered list containing only read operations
     """
-    return [
-        (func, name, description, is_read_only) for func, name, description, is_read_only in functions if is_read_only
-    ]
+    # Keywords that indicate write operations
+    write_keywords = {'create', 'update', 'delete', 'patch', 'add', 'remove', 'set', 'modify', 'edit'}
+    
+    # Filter functions to exclude write operations
+    filtered_functions = []
+    for func_info in functions:
+        name = func_info[1].lower()
+        if not any(keyword in name for keyword in write_keywords):
+            filtered_functions.append(func_info)
+    
+    return filtered_functions
 
 
 @click.command()
 @click.option(
     "--transport",
-    type=click.Choice(["stdio", "sse"]),
+    type=click.Choice(["stdio", "sse", "http", "websocket"]),
     default="stdio",
     help="Transport type for MCP communication",
 )
 @click.option(
+    "--host",
+    default="0.0.0.0",
+    help="Host for HTTP/WebSocket server (only for http/websocket transport)",
+)
+@click.option(
+    "--port",
+    default=8000,
+    help="Port for HTTP/WebSocket server (only for http/websocket transport)",
+)
+@click.option(
     "--apis",
-    type=click.Choice([api.value for api in APIType]),
-    default=[api.value for api in APIType],
     multiple=True,
+    type=click.Choice([api.value for api in APIType]),
+    default=["table", "database", "databaseschema", "dashboard", "chart", "pipeline", "topic", "metrics", "container"],
     help="API groups to enable (default: core entities and common assets)",
 )
 @click.option(
     "--read-only",
     is_flag=True,
+    default=False,
     help="Only expose read-only tools (GET operations, no CREATE/UPDATE/DELETE)",
 )
-def main(transport: str, apis: List[str], read_only: bool) -> None:
+@click.option(
+    "--require-auth",
+    is_flag=True,
+    default=False,
+    help="Require authentication for remote server (only for http/websocket transport)",
+)
+@click.option(
+    "--test",
+    is_flag=True,
+    default=False,
+    help="Run in interactive testing mode",
+)
+def main(transport, host, port, apis, read_only, require_auth, test):
     """Start the MCP OpenMetadata server with selected API groups."""
-    from src.config import Config
-    from src.openmetadata.openmetadata_client import initialize_client
-    from src.server import app
+    # Configure logging
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
 
-    # Get OpenMetadata credentials from environment
+    # Initialize configuration
     config = Config.from_env()
+    
+    # Initialize monitoring
+    monitoring_status = initialize_monitoring(config)
+    logger.info("Monitoring initialized: %s", monitoring_status)
+
+    # Handle test mode
+    if test:
+        asyncio.run(run_interactive_testing(config))
+        return
 
     # Initialize global OpenMetadata client
-    initialize_client(
-        host=config.OPENMETADATA_HOST,
-        api_token=config.OPENMETADATA_JWT_TOKEN,
-        username=config.OPENMETADATA_USERNAME,
-        password=config.OPENMETADATA_PASSWORD,
-    )
+    try:
+        initialize_client(
+            host=config.OPENMETADATA_HOST,
+            api_token=config.OPENMETADATA_JWT_TOKEN,
+            username=config.OPENMETADATA_USERNAME,
+            password=config.OPENMETADATA_PASSWORD,
+        )
+        logger.info("Successfully initialized OpenMetadata client for host: %s", config.OPENMETADATA_HOST)
+    except (ValueError, ConnectionError) as e:
+        logger.error("Failed to initialize OpenMetadata client: %s", e)
+        logger.error("Please check your OpenMetadata configuration and ensure the server is accessible")
+        return
 
+    # Register API functions with bulk loading for performance
     registered_count = 0
+    functions_to_register = []
+    
+    # First gather all functions to register
     for api in apis:
-        logging.debug(f"Adding API: {api}")
-        get_function = APITYPE_TO_FUNCTIONS[APIType(api)]
+        logger.debug("Adding API: %s", api)
+        
         try:
+            api_type = APIType(api)
+            get_function = APITYPE_TO_FUNCTIONS.get(api_type)
+            if not get_function:
+                logger.warning("API type '%s' not found in function mapping", api)
+                continue
+                
             functions = get_function()
-        except NotImplementedError:
-            logging.warning(f"API type '{api}' not implemented yet")
+        except (ValueError, KeyError, NotImplementedError) as e:
+            logger.warning("API type '%s' not available: %s", api, e)
+            continue
+        except (TypeError, AttributeError, ImportError) as e:
+            # More specific exceptions that could occur during module loading
+            logger.error("Error loading API '%s': %s", api, e)
             continue
 
         # Filter functions for read-only mode if requested
         if read_only:
+            original_count = len(functions)
             functions = filter_functions_for_read_only(functions)
+            filtered_count = original_count - len(functions)
+            if filtered_count > 0:
+                logger.info("Filtered out %d write operations from %s API (read-only mode)", 
+                            filtered_count, api)
+            
+        # Add to bulk registration list
+        functions_to_register.extend(functions)
+        logger.info("Collected %d tools from %s API", len(functions), api)
+    
+    if not functions_to_register:
+        logger.error("No API functions were registered. Check your API selections and server configuration.")
+        return
+        
+    # Now register all functions in a single batch for better performance
+    for func, name, description, *_ in functions_to_register:
+        register_tool(func, name=name, description=description)
+        registered_count += 1
 
-        for func, name, description, *_ in functions:
-            app.add_tool(func, name=name, description=description)
-            registered_count += 1
+    logger.info("Total registered tools: %d", registered_count)
 
-        logging.info(f"Registered {len(functions)} tools from {api} API")
+    # Start the appropriate server
+    _start_server(transport, host, port, require_auth, logger)
 
-    logging.info(f"Total registered tools: {registered_count}")
 
-    if transport == "sse":
-        logging.debug("Starting MCP server for OpenMetadata with SSE transport")
-        app.run(transport="sse")
+def _start_server(transport, host, port, require_auth, logger):
+    """Start the server with the specified transport."""
+    if transport in ["http", "websocket"]:
+        logger.info("Starting %s server on %s:%d", transport.upper(), host, port)
+        
+        if require_auth:
+            logger.info("Authentication required for %s server", transport)
+        else:
+            logger.info("Authentication disabled for %s server", transport)
+        
+        try:
+            # Use the existing config
+            config = Config.from_env()
+            
+            # Create a minimal app that can at least start
+            minimal_app = FastAPI(
+                title="OpenMetadata MCP Server",
+                description="MCP server for OpenMetadata integration",
+                version="1.0.0"
+            )
+            
+            # Add CORS middleware
+            minimal_app.add_middleware(
+                CORSMiddleware,
+                allow_origins=config.cors_origins_list,
+                allow_credentials=True,
+                allow_methods=["*"],
+                allow_headers=["*"],
+            )
+            
+            # Add basic authentication if required
+            if require_auth:
+                try:
+                    from src.auth import AuthDependency, APIKeyAuthBackend
+                    
+                    # Create a simplified auth dependency with just API key validation for minimal mode
+                    auth_backend = APIKeyAuthBackend()
+                    auth_dependency = AuthDependency(require_authentication=True, backends=[auth_backend])
+                    
+                    # Update endpoints to require authentication
+                    @minimal_app.get("/", dependencies=[Depends(auth_dependency)])
+                    async def root():
+                        return {
+                            "message": "OpenMetadata MCP Server is running in minimal mode.", 
+                            "status": "There was an error loading the full server functionality. Please check server logs."
+                        }
+                    
+                    @minimal_app.get("/health", dependencies=[Depends(auth_dependency)])
+                    async def health():
+                        return {"status": "ok", "mode": "minimal", "auth": "required"}
+                    
+                    @minimal_app.get("/metrics", dependencies=[Depends(auth_dependency)])
+                    async def metrics():
+                        return {"status": "ok", "metrics": "Prometheus metrics endpoint (minimal mode)"}
+                except ImportError:
+                    logger.error("Failed to import authentication modules. Running with minimal security.")
+                    # Fallback to basic endpoints without authentication
+                    @minimal_app.get("/")
+                    async def root():
+                        return {
+                            "message": "OpenMetadata MCP Server is running in minimal mode with no authentication.", 
+                            "status": "There was an error loading authentication modules. Please check server logs."
+                        }
+                    
+                    @minimal_app.get("/health")
+                    async def health():
+                        return {"status": "ok", "mode": "minimal", "auth": "failed"}
+                    
+                    @minimal_app.get("/metrics")
+                    async def metrics():
+                        return {"status": "ok", "metrics": "Prometheus metrics endpoint (minimal mode, no auth)"}
+            else:
+                @minimal_app.get("/")
+                async def root():
+                    return {
+                        "message": "OpenMetadata MCP Server is running in minimal mode.", 
+                        "status": "There was an error loading the full server functionality. Please check server logs."
+                    }
+                
+                @minimal_app.get("/health")
+                async def health():
+                    return {"status": "ok", "mode": "minimal", "auth": "none"}
+                
+                @minimal_app.get("/metrics")
+                async def metrics():
+                    return {"status": "ok", "metrics": "Prometheus metrics endpoint (minimal mode)"}
+                
+            # Configure Uvicorn with optimized settings
+            logger.info("Using minimal FastAPI app (standalone mode)")
+            uvicorn.run(
+                minimal_app, 
+                host=host, 
+                port=port, 
+                log_level="info",
+                workers=None,  # Default to number of CPU cores
+                loop="auto",   # Use best available event loop
+                http="auto",   # Use best available HTTP protocol implementation
+                limit_concurrency=None,  # No artificial concurrency limit
+                limit_max_requests=None,  # No restart after max requests
+                timeout_keep_alive=75,   # Longer keep-alive for WebSocket connections
+            )
+        except ImportError as e:
+            logger.error("Failed to import required modules for %s server: %s", transport, e)
+            return
+        except (RuntimeError, ValueError, OSError) as e:
+            logger.error("Failed to start %s server: %s", transport, e)
+            return
+        
+    elif transport == "sse":
+        logger.debug("Starting MCP server for OpenMetadata with SSE transport")
+        try:
+            app.run(transport="sse")
+        except (RuntimeError, ValueError, OSError) as e:
+            logger.error("Failed to start SSE server: %s", e)
     else:
-        logging.debug("Starting MCP server for OpenMetadata with stdio transport")
-        app.run(transport="stdio")
+        logger.debug("Starting MCP server for OpenMetadata with stdio transport")
+        try:
+            app.run(transport="stdio")
+        except (RuntimeError, ValueError, OSError) as e:
+            logger.error("Failed to start stdio server: %s", e)
 
 
 if __name__ == "__main__":
-    main()
+    main()  # pylint: disable=no-value-for-parameter
