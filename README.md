@@ -22,11 +22,10 @@ A **modernized** Model Context Protocol (MCP) server for OpenMetadata with enter
 # 1. Install uv (if not already installed)
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# 2. Install dependencies (includes web + auth + monitoring)
+# 2. Install dependencies (automatically creates .env file from template)
 make install-all
 
-# 3. Configure
-cp .env.example .env
+# 3. Configure your OpenMetadata connection
 # Edit .env with your OpenMetadata server details
 
 # 4. Validate setup

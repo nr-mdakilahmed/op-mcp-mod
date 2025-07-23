@@ -7,6 +7,7 @@ IS_DEV := $(shell test -f $(DEV_ENV_FILE) && echo "true" || echo "false")
 
 # Installation targets
 install:
+	@echo "🔍 Auto-detecting environment and installing dependencies..."
 	@if [ "$(IS_DEV)" = "true" ]; then \
 		echo "🔧 Development environment detected - setting up virtual environment..."; \
 		$(MAKE) setup-dev; \
@@ -14,18 +15,37 @@ install:
 		echo "🚀 Production environment detected - installing dependencies..."; \
 		$(MAKE) install-prod; \
 	fi
+	@echo "💡 Run 'make validate' to verify your setup!"
 
 install-all:
+	@echo "📦 Installing all dependencies..."
+	@if [ ! -f .env ]; then \
+		echo "📝 Creating .env file from template..."; \
+		cp .env.example .env; \
+		echo "✅ Created .env file - please configure it with your settings"; \
+	fi
 	uv sync --extra all
+	@echo "✅ All dependencies installed!"
 
 install-dev: 
+	@echo "📦 Installing development dependencies..."
+	@if [ ! -f .env ]; then \
+		echo "📝 Creating .env file from template..."; \
+		cp .env.example .env; \
+		echo "✅ Created .env file - please configure it with your settings"; \
+	fi
 	uv sync --extra dev
+	@echo "✅ Development dependencies installed!"
 
 install-prod:
+	@echo "📦 Installing production dependencies..."
+	@if [ ! -f .env ]; then \
+		echo "📝 Creating .env file from template..."; \
+		cp .env.example .env; \
+		echo "⚠️  Don't forget to configure your .env file with production settings!"; \
+	fi
 	uv sync --no-dev --extra web --extra auth --extra monitoring
-
-install-web:
-	uv sync --extra web --extra auth
+	@echo "✅ Production dependencies installed!"
 
 # Development setup (creates venv and installs dev dependencies)
 setup-dev:
@@ -120,7 +140,6 @@ help:
 	@echo "  make install-all       Install all dependencies"
 	@echo "  make install-dev       Install development dependencies"
 	@echo "  make install-prod      Install production dependencies only"
-	@echo "  make install-web       Install web server dependencies"
 	@echo ""
 	@echo "🚀 Running:"
 	@echo "  make run               Run MCP server (stdio mode)"
