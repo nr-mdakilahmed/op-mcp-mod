@@ -7,6 +7,7 @@ and manages server lifecycle with chosen transport protocol.
 
 import asyncio
 import logging
+import os
 import sys
 
 import click
@@ -403,7 +404,6 @@ def _start_server(transport, host, port, require_auth, logger):
         logger.info("Starting MCP server for OpenMetadata with Streamable HTTP transport on %s:%d", host, port)
         try:
             # Set environment variables for streamable-http transport
-            import os
             os.environ["MCP_HOST"] = host
             os.environ["MCP_PORT"] = str(port)
             app.run(transport="streamable-http")
