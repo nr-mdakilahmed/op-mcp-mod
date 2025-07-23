@@ -37,6 +37,7 @@ try:
     HEALTH_ROUTER_AVAILABLE = True
 except ImportError:
     HEALTH_ROUTER_AVAILABLE = False
+
 # Import all API module functions with descriptive aliases
 from src.openmetadata.bots import get_all_functions as get_bots_functions
 from src.openmetadata.charts import get_all_functions as get_charts_functions
@@ -198,11 +199,11 @@ def main(transport, host, port, apis, read_only, require_auth, enhanced_client, 
     # Initialize global OpenMetadata client
     try:
         # Debug: Print configuration values
-        logger.info(f"OpenMetadata configuration:")
-        logger.info(f"  HOST: {config.OPENMETADATA_HOST}")
-        logger.info(f"  JWT_TOKEN: {config.OPENMETADATA_JWT_TOKEN is not None}")
-        logger.info(f"  USERNAME: '{config.OPENMETADATA_USERNAME}'")
-        logger.info(f"  PASSWORD: '{config.OPENMETADATA_PASSWORD}'")
+        logger.info("OpenMetadata configuration:")
+        logger.info("  HOST: %s", config.OPENMETADATA_HOST)
+        logger.info("  JWT_TOKEN: %s", config.OPENMETADATA_JWT_TOKEN is not None)
+        logger.info("  USERNAME: '%s'", config.OPENMETADATA_USERNAME)
+        logger.info("  PASSWORD: '%s'", config.OPENMETADATA_PASSWORD)
         
         # Check if enhanced client should be used
         if enhanced_client and ENHANCED_CLIENT_AVAILABLE:
