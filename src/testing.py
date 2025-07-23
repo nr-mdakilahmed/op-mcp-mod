@@ -32,7 +32,7 @@ async def register_tools_for_testing(config: Config) -> None:
         search_functions = get_search_functions()
         for func, name, description, *_ in search_functions:
             register_tool(func, name=name, description=description)
-        
+
         logger.info("Registered %d search tools for testing", len(search_functions))
 
     except (ValueError, ConnectionError, ImportError, AttributeError) as e:

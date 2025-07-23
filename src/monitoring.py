@@ -25,7 +25,7 @@ from src.config import Config
 
 def setup_logging(config: Config | None = None, transport: str = None) -> None:
     """Setup structured logging configuration.
-    
+
     Args:
         config: Configuration object
         transport: Transport type (stdio, http, etc.) - affects output stream
@@ -35,7 +35,7 @@ def setup_logging(config: Config | None = None, transport: str = None) -> None:
 
     # Configure log level
     log_level = getattr(logging, config.LOG_LEVEL.upper(), logging.INFO)
-    
+
     # For stdio transport, use stderr to avoid interfering with JSON-RPC protocol
     output_stream = sys.stderr if transport == "stdio" else sys.stdout
 
@@ -241,7 +241,7 @@ def log_mcp_operation(
 
 def initialize_monitoring(config: Config | None = None, transport: str = None) -> dict[str, bool]:
     """Initialize all monitoring systems.
-    
+
     Args:
         config: Configuration object
         transport: Transport type (affects logging output stream)

@@ -186,37 +186,37 @@ class OpenMetadataClient:
     def _authenticate_with_login(self) -> None:
         """Authenticate using username/password to get JWT token."""
         import base64
-        
+
         # Encode password in base64 as required by OpenMetadata
         encoded_password = base64.b64encode(self._password.encode()).decode()
-        
+
         # Prepare login request
         login_data = {
             "email": self._username,
             "password": encoded_password
         }
-        
+
         # Debug logging
         logger.debug("Attempting login with email: %s", self._username)
         logger.debug("Encoded password: %s", encoded_password)
-        
+
         # Make login request to OpenMetadata
         login_url = urljoin(self.host, "/api/v1/users/login")
-        
+
         try:
             response = self.session.post(login_url, json=login_data)
             response.raise_for_status()
-            
+
             login_response = response.json()
             access_token = login_response.get("accessToken")
-            
+
             if not access_token:
                 raise OpenMetadataError("Login successful but no access token received")
-            
+
             # Set the authorization header with the JWT token
             self.session.headers["Authorization"] = f"Bearer {access_token}"
             logger.info("Successfully authenticated with OpenMetadata using username/password")
-            
+
         except httpx.HTTPStatusError as e:
             error_msg = f"Login failed: HTTP {e.response.status_code}: {e.response.text}"
             logger.error(error_msg)
@@ -441,34 +441,34 @@ class AsyncOpenMetadataClient:
     async def _authenticate_with_login(self) -> None:
         """Authenticate using username/password to get JWT token (async)."""
         import base64
-        
+
         # Encode password in base64 as required by OpenMetadata
         encoded_password = base64.b64encode(self._password.encode()).decode()
-        
+
         # Prepare login request
         login_data = {
             "email": self._username,
             "password": encoded_password
         }
-        
+
         # Make login request to OpenMetadata
         login_url = urljoin(self.host, "/api/v1/users/login")
-        
+
         try:
             response = await self.session.post(login_url, json=login_data)
             response.raise_for_status()
-            
+
             login_response = response.json()
             access_token = login_response.get("accessToken")
-            
+
             if not access_token:
                 raise OpenMetadataError("Login successful but no access token received")
-            
+
             # Set the authorization header with the JWT token
             self.session.headers["Authorization"] = f"Bearer {access_token}"
             self._needs_authentication = False
             logger.info("Successfully authenticated with OpenMetadata using username/password (async)")
-            
+
         except httpx.HTTPStatusError as e:
             error_msg = f"Async login failed: HTTP {e.response.status_code}: {e.response.text}"
             logger.error(error_msg)
@@ -502,7 +502,7 @@ class AsyncOpenMetadataClient:
         # Perform authentication if needed
         if hasattr(self, '_needs_authentication') and self._needs_authentication:
             await self._authenticate_with_login()
-        
+
         url = urljoin(self.base_url, endpoint)
 
         logger.debug("Making async %s request to %s", method, url)
@@ -603,10 +603,10 @@ class AsyncOpenMetadataClient:
 
 def format_response_as_json(data: Any) -> str:
     """Convert response data to properly formatted JSON string.
-    
+
     Args:
         data: The response data to convert to JSON
-        
+
     Returns:
         JSON formatted string
     """
@@ -615,13 +615,13 @@ def format_response_as_json(data: Any) -> str:
 
 def format_response_as_raw_json(data: Any) -> str:
     """Convert response data to compact JSON string for single Inspector response.
-    
+
     This function returns JSON without extra formatting to prevent duplicate
     responses in MCP Inspector - the Inspector will format it naturally.
-    
+
     Args:
         data: The response data to convert to JSON
-        
+
     Returns:
         Compact JSON string
     """

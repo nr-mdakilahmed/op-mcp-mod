@@ -15,10 +15,22 @@ class Config(BaseSettings):
     """Configuration settings for the MCP OpenMetadata server."""
 
     # OpenMetadata Configuration
-    OPENMETADATA_HOST: str = Field(default="http://localhost:8585", description="OpenMetadata server host")
-    OPENMETADATA_USERNAME: str = Field(default="admin@open-metadata.org", description="OpenMetadata username")
-    OPENMETADATA_PASSWORD: str = Field(default="admin", description="OpenMetadata password")
-    OPENMETADATA_JWT_TOKEN: str | None = Field(default=None, description="OpenMetadata JWT token (optional)")
+    OPENMETADATA_HOST: str = Field(
+        default="http://localhost:8585",
+        description="OpenMetadata server host"
+    )
+    OPENMETADATA_USERNAME: str = Field(
+        default="admin@open-metadata.org",
+        description="OpenMetadata username"
+    )
+    OPENMETADATA_PASSWORD: str = Field(
+        default="admin",
+        description="OpenMetadata password"
+    )
+    OPENMETADATA_JWT_TOKEN: str | None = Field(
+        default=None,
+        description="OpenMetadata JWT token (optional)"
+    )
 
     # Remote Server Configuration
     HTTP_HOST: str = Field(default="0.0.0.0", description="HTTP server host")
@@ -36,26 +48,46 @@ class Config(BaseSettings):
         min_length=32,
     )
     JWT_ALGORITHM: str = Field(default="HS256", description="JWT algorithm")
-    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30, description="JWT token expiration in minutes", ge=1)
-    API_KEY_HEADER: str = Field(default="X-API-Key", description="API key header name")
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(
+        default=30,
+        description="JWT token expiration in minutes",
+        ge=1
+    )
+    API_KEY_HEADER: str = Field(
+        default="X-API-Key",
+        description="API key header name"
+    )
     DEFAULT_API_KEY: str = Field(
-        default="mcp-openmetadata-default-key-change-this", description="Default API key for authentication"
+        default="mcp-openmetadata-default-key-change-this",
+        description="Default API key for authentication"
     )
 
     # Sentry Configuration
     SENTRY_DSN: str | None = Field(default=None, description="Sentry DSN for error monitoring")
     SENTRY_ENVIRONMENT: str = Field(default="development", description="Sentry environment")
-    SENTRY_TRACES_SAMPLE_RATE: float = Field(default=0.1, description="Sentry traces sample rate", ge=0.0, le=1.0)
+    SENTRY_TRACES_SAMPLE_RATE: float = Field(
+        default=0.1,
+        description="Sentry traces sample rate",
+        ge=0.0,
+        le=1.0
+    )
 
     # Logging Configuration
     LOG_LEVEL: str = Field(default="INFO", description="Logging level")
     STRUCTURED_LOGGING: bool = Field(default=True, description="Use structured logging")
 
     # Google OAuth Configuration
-    GOOGLE_CLIENT_ID: str | None = Field(default=None, description="Google OAuth client ID")
-    GOOGLE_CLIENT_SECRET: str | None = Field(default=None, description="Google OAuth client secret")
+    GOOGLE_CLIENT_ID: str | None = Field(
+        default=None,
+        description="Google OAuth client ID"
+    )
+    GOOGLE_CLIENT_SECRET: str | None = Field(
+        default=None,
+        description="Google OAuth client secret"
+    )
     GOOGLE_REDIRECT_URI: str = Field(
-        default="http://localhost:8000/auth/google/callback", description="Google OAuth redirect URI"
+        default="http://localhost:8000/auth/google/callback",
+        description="Google OAuth redirect URI"
     )
     OAUTH_ALLOWED_DOMAINS: str | None = Field(
         default=None, description="Comma-separated list of allowed email domains for OAuth"
@@ -131,7 +163,8 @@ class Config(BaseSettings):
 
     # Class variable to store the singleton instance
 
-    # Class variable to store the singleton instance (using ClassVar to avoid Pydantic treating it as a field)
+    # Class variable to store the singleton instance
+    # (using ClassVar to avoid Pydantic treating it as a field)
     _config_instance: ClassVar[Optional["Config"]] = None
 
     @classmethod

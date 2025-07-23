@@ -112,7 +112,10 @@ def filter_functions_for_read_only(functions):
         Filtered list containing only read operations
     """
     # Keywords that indicate write operations
-    write_keywords = {"create", "update", "delete", "patch", "add", "remove", "set", "modify", "edit"}
+    write_keywords = {
+        "create", "update", "delete", "patch", "add",
+        "remove", "set", "modify", "edit"
+    }
 
     # Filter functions to exclude write operations
     filtered_functions = []
@@ -129,7 +132,10 @@ def filter_functions_for_read_only(functions):
     "--transport",
     type=click.Choice(["stdio", "sse", "streamable-http", "http", "websocket"]),
     default="stdio",
-    help="Transport type for MCP communication (stdio, sse, streamable-http for MCP; http, websocket for REST API)",
+    help=(
+        "Transport type for MCP communication "
+        "(stdio, sse, streamable-http for MCP; http, websocket for REST API)"
+    ),
 )
 @click.option(
     "--host",
@@ -145,7 +151,10 @@ def filter_functions_for_read_only(functions):
     "--apis",
     multiple=True,
     type=click.Choice([api.value for api in APIType]),
-    default=["table", "database", "databaseschema", "dashboard", "chart", "pipeline", "topic", "metrics", "container"],
+    default=[
+        "table", "database", "databaseschema", "dashboard", "chart",
+        "pipeline", "topic", "metrics", "container"
+    ],
     help="API groups to enable (default: core entities and common assets)",
 )
 @click.option(
@@ -158,7 +167,10 @@ def filter_functions_for_read_only(functions):
     "--require-auth",
     is_flag=True,
     default=False,
-    help="Require authentication for remote server (only for http/websocket transport)",
+    help=(
+        "Require authentication for remote server "
+        "(only for http/websocket transport)"
+    ),
 )
 @click.option(
     "--test",
@@ -205,7 +217,7 @@ def main(transport, host, port, apis, read_only, require_auth, enhanced_client, 
         logger.info("  JWT_TOKEN: %s", config.OPENMETADATA_JWT_TOKEN is not None)
         logger.info("  USERNAME: '%s'", config.OPENMETADATA_USERNAME)
         logger.info("  PASSWORD: '%s'", config.OPENMETADATA_PASSWORD)
-        
+
         # Check if enhanced client should be used
         if enhanced_client and ENHANCED_CLIENT_AVAILABLE:
             # Use enhanced client with caching and connection pooling
@@ -215,7 +227,10 @@ def main(transport, host, port, apis, read_only, require_auth, enhanced_client, 
                 username=config.OPENMETADATA_USERNAME,
                 password=config.OPENMETADATA_PASSWORD,
             )
-            logger.info("Successfully initialized Enhanced OpenMetadata client with caching and connection pooling")
+            logger.info(
+                "Successfully initialized Enhanced OpenMetadata client "
+                "with caching and connection pooling"
+            )
         else:
             # Use standard client
             initialize_client(
@@ -229,7 +244,10 @@ def main(transport, host, port, apis, read_only, require_auth, enhanced_client, 
         logger.info("Connected to OpenMetadata server at: %s", config.OPENMETADATA_HOST)
     except (ValueError, ConnectionError) as e:
         logger.error("Failed to initialize OpenMetadata client: %s", e)
-        logger.error("Please check your OpenMetadata configuration and ensure the server is accessible")
+        logger.error(
+            "Please check your OpenMetadata configuration and ensure "
+            "the server is accessible"
+        )
         return
 
     # Register API functions with bulk loading for performance
@@ -262,14 +280,20 @@ def main(transport, host, port, apis, read_only, require_auth, enhanced_client, 
             functions = filter_functions_for_read_only(functions)
             filtered_count = original_count - len(functions)
             if filtered_count > 0:
-                logger.info("Filtered out %d write operations from %s API (read-only mode)", filtered_count, api)
+                logger.info(
+                    "Filtered out %d write operations from %s API (read-only mode)",
+                    filtered_count, api
+                )
 
         # Add to bulk registration list
         functions_to_register.extend(functions)
         logger.info("Collected %d tools from %s API", len(functions), api)
 
     if not functions_to_register:
-        logger.error("No API functions were registered. Check your API selections and server configuration.")
+        logger.error(
+            "No API functions were registered. Check your API selections "
+            "and server configuration."
+        )
         return
 
     # Now register all functions in a single batch for better performance
@@ -299,7 +323,9 @@ def _start_server(transport, host, port, require_auth, logger):
 
             # Create a minimal app that can at least start
             minimal_app = FastAPI(
-                title="OpenMetadata MCP Server", description="MCP server for OpenMetadata integration", version="0.3.0"
+                title="OpenMetadata MCP Server",
+                description="MCP server for OpenMetadata integration",
+                version="0.3.0"
             )
 
             # Add CORS middleware
@@ -314,9 +340,12 @@ def _start_server(transport, host, port, require_auth, logger):
             # Add basic authentication if required
             if require_auth:
                 if AUTH_AVAILABLE:
-                    # Create a simplified auth dependency with just API key validation for minimal mode
+                    # Create a simplified auth dependency with just API key
+                    # validation for minimal mode
                     auth_backend = APIKeyAuthBackend()
-                    auth_dependency = AuthDependency(require_authentication=True, backends=[auth_backend])
+                    auth_dependency = AuthDependency(
+                        require_authentication=True, backends=[auth_backend]
+                    )
 
                     # Update endpoints to require authentication
                     @minimal_app.get("/", dependencies=[Depends(auth_dependency)])
@@ -333,16 +362,28 @@ def _start_server(transport, host, port, require_auth, logger):
 
                     @minimal_app.get("/metrics", dependencies=[Depends(auth_dependency)])
                     async def metrics():
-                        return {"status": "ok", "metrics": "Prometheus metrics endpoint (minimal mode)"}
+                        return {
+                            "status": "ok",
+                            "metrics": "Prometheus metrics endpoint (minimal mode)"
+                        }
                 else:
-                    logger.error("Failed to import authentication modules. Running with minimal security.")
+                    logger.error(
+                        "Failed to import authentication modules. "
+                        "Running with minimal security."
+                    )
 
                     # Fallback to basic endpoints without authentication
                     @minimal_app.get("/")
                     async def root():
                         return {
-                            "message": "OpenMetadata MCP Server is running in minimal mode with no authentication.",
-                            "status": "There was an error loading authentication modules. Please check server logs.",
+                            "message": (
+                                "OpenMetadata MCP Server is running in minimal mode "
+                                "with no authentication."
+                            ),
+                            "status": (
+                                "There was an error loading authentication modules. "
+                                "Please check server logs."
+                            ),
                         }
 
                     @minimal_app.get("/health")
@@ -351,14 +392,20 @@ def _start_server(transport, host, port, require_auth, logger):
 
                     @minimal_app.get("/metrics")
                     async def metrics():
-                        return {"status": "ok", "metrics": "Prometheus metrics endpoint (minimal mode, no auth)"}
+                        return {
+                            "status": "ok",
+                            "metrics": "Prometheus metrics endpoint (minimal mode, no auth)"
+                        }
             else:
                 # Add basic endpoints without authentication requirement
                 @minimal_app.get("/")
                 async def root():
                     return {
                         "message": "OpenMetadata MCP Server is running in minimal mode.",
-                        "status": "Server started successfully. Health monitoring available at /api/health",
+                        "status": (
+                            "Server started successfully. "
+                            "Health monitoring available at /api/health"
+                        ),
                     }
 
             # Add health monitoring endpoints
@@ -366,7 +413,9 @@ def _start_server(transport, host, port, require_auth, logger):
                 minimal_app.include_router(health_router)
                 logger.info("Health monitoring endpoints registered successfully")
             else:
-                logger.warning("Failed to register health endpoints: health router not available")
+                logger.warning(
+                    "Failed to register health endpoints: health router not available"
+                )
 
                 # Add basic fallback health endpoint
                 @minimal_app.get("/health")
@@ -401,7 +450,10 @@ def _start_server(transport, host, port, require_auth, logger):
         except (RuntimeError, ValueError, OSError) as e:
             logger.error("Failed to start SSE server: %s", e)
     elif transport == "streamable-http":
-        logger.info("Starting MCP server for OpenMetadata with Streamable HTTP transport on %s:%d", host, port)
+        logger.info(
+            "Starting MCP server for OpenMetadata with Streamable HTTP transport on %s:%d",
+            host, port
+        )
         try:
             # Set environment variables for streamable-http transport
             os.environ["MCP_HOST"] = host
