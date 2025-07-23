@@ -22,22 +22,25 @@ from src.openmetadata.openmetadata_client import initialize_client
 
 try:
     from src.openmetadata.enhanced_client import initialize_enhanced_client
-
     ENHANCED_CLIENT_AVAILABLE = True
 except ImportError:
     ENHANCED_CLIENT_AVAILABLE = False
+    initialize_enhanced_client = None
+
 try:
     from src.auth import APIKeyAuthBackend, AuthDependency
-
     AUTH_AVAILABLE = True
 except ImportError:
     AUTH_AVAILABLE = False
+    APIKeyAuthBackend = None
+    AuthDependency = None
+
 try:
     from src.health import router as health_router
-
     HEALTH_ROUTER_AVAILABLE = True
 except ImportError:
     HEALTH_ROUTER_AVAILABLE = False
+    health_router = None
 
 # Import all API module functions with descriptive aliases
 from src.openmetadata.bots import get_all_functions as get_bots_functions
@@ -219,24 +222,28 @@ def main(transport, host, port, apis, read_only, require_auth, enhanced_client, 
         logger.info("  PASSWORD: %s", "***SET***" if config.OPENMETADATA_PASSWORD else "Not set")
 
         # Check if enhanced client should be used
-        if enhanced_client and ENHANCED_CLIENT_AVAILABLE:
-            # Use enhanced client with caching and connection pooling
-            initialize_enhanced_client(
-                host=config.OPENMETADATA_HOST,
-                api_token=config.OPENMETADATA_JWT_TOKEN,
-                username=config.OPENMETADATA_USERNAME,
-                password=config.OPENMETADATA_PASSWORD,
-            )
-            logger.info(
-                "Successfully initialized Enhanced OpenMetadata client "
-                "with caching and connection pooling"
-            )
+        if enhanced_client and ENHANCED_CLIENT_AVAILABLE and initialize_enhanced_client:
+            try:
+                # Use enhanced client with caching and connection pooling
+                initialize_enhanced_client(
+                    host=config.OPENMETADATA_HOST,
+                    api_token=config.OPENMETADATA_JWT_TOKEN,
+                    username=config.OPENMETADATA_USERNAME,
+                    password=config.OPENMETADATA_PASSWORD,
+                )
+                logger.info(
+                    "Successfully initialized Enhanced OpenMetadata client "
+                    "with caching and connection pooling"
+                )
+            except NameError as exc:
+                logger.error("Enhanced client function not available despite import check")
+                raise ImportError("Enhanced client initialization failed") from exc
         else:
             if enhanced_client and not ENHANCED_CLIENT_AVAILABLE:
                 logger.warning(
                     "Enhanced client requested but not available, falling back to standard client"
                 )
-            
+
             # Use standard client
             initialize_client(
                 host=config.OPENMETADATA_HOST,
@@ -254,7 +261,7 @@ def main(transport, host, port, apis, read_only, require_auth, enhanced_client, 
             "the server is accessible"
         )
         return
-    except Exception as e:
+    except (ImportError, AttributeError, ModuleNotFoundError) as e:
         logger.error("Unexpected error during OpenMetadata client initialization: %s", e)
         return
 
@@ -330,7 +337,7 @@ def _start_server(transport, host, port, require_auth, logger):
 def _start_http_server(transport, host, port, require_auth, logger):
     """Start HTTP/WebSocket server with FastAPI."""
     logger.info("Starting %s server on %s:%d", transport.upper(), host, port)
-    
+
     if require_auth:
         logger.info("Authentication required for %s server", transport)
     else:
@@ -358,7 +365,7 @@ def _start_http_server(transport, host, port, require_auth, logger):
 
         # Setup authentication and endpoints
         _setup_http_endpoints(http_app, require_auth, logger)
-        
+
         # Add health monitoring endpoints
         _setup_health_endpoints(http_app, logger)
 
@@ -386,7 +393,7 @@ def _start_http_server(transport, host, port, require_auth, logger):
 
 def _setup_http_endpoints(http_app, require_auth, logger):
     """Setup HTTP endpoints with optional authentication."""
-    if require_auth and AUTH_AVAILABLE:
+    if require_auth and AUTH_AVAILABLE and APIKeyAuthBackend and AuthDependency:
         # Create authentication dependency
         auth_backend = APIKeyAuthBackend()
         auth_dependency = AuthDependency(
@@ -444,7 +451,7 @@ def _setup_http_endpoints(http_app, require_auth, logger):
 
 def _setup_health_endpoints(http_app, logger):
     """Setup health monitoring endpoints."""
-    if HEALTH_ROUTER_AVAILABLE:
+    if HEALTH_ROUTER_AVAILABLE and health_router:
         http_app.include_router(health_router)
         logger.info("Health monitoring endpoints registered successfully")
     else:

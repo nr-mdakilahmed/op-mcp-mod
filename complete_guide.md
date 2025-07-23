@@ -1,53 +1,179 @@
 # MCP Server for OpenMetadata - Complete Guide
 
-<div align="center">
-
-### 🔗 **[View on Glama.ai MCP Registry →](https://glama.ai/mcp/servers/@yangkyeongmo/mcp-server-openmetadata)**
-
-</div>
+A modernized Model Context Protocol (MCP) server for OpenMetadata, providing robust, secure, and flexible access to metadata for AI assistants and web applications.
 
 ---
-
-A **modernized** Model Context Protocol (MCP) server implementation for OpenMetadata, providing AI assistants with robust, secure access to metadata from your data ecosystem.
 
 ## 🎯 Quick Start
 
-### Option 1: Using with AI Assistants (Claude, ChatGPT)
+### Prerequisites
+- Python 3.10+
+- OpenMetadata server instance
+- uv package manager
+
+### Installation
+
 ```bash
-# Install uv if not already installed
+git clone https://github.com/yangkyeongmo/mcp-server-openmetadata
+cd mcp-server-openmetadata
+
 curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install dependencies with all features
 make install-all
-
-# Configure OpenMetadata connection
-cp .env.example .env
-# Edit .env with your OpenMetadata server details
-
-# Validate setup
-make validate
-
-# Run with Claude Desktop
-make run
 ```
 
-### Option 2: Web Server with Authentication
-```bash
-# Start the remote server with authentication
-make run-web-auth
+### Configuration
 
-# Access the web dashboard
-open http://localhost:8000
+```bash
+cp .env.example .env
+# Edit .env with your OpenMetadata server details
+```
+
+### Validation
+
+```bash
+make validate
+```
+
+### Running
+
+```bash
+make run            # stdio transport (AI assistants)
+make run-web        # HTTP server
+make run-web-auth   # HTTP server with authentication
 ```
 
 ---
 
-## 🚀 Features & Architecture
+## ✨ Features
 
-### Core OpenMetadata Integration
-- **🔍 Advanced Search**: Find databases, tables, dashboards, and other data assets
-- **📊 Entity Details**: Comprehensive information about data entities
-- **🔗 Lineage Tracking**: Explore data lineage and dependencies
+- **186+ OpenMetadata Tools**: Search, lineage, glossaries, dashboards, tables, users, teams, policies, and more
+- **Multi-Transport**: stdio, HTTP, WebSocket, SSE
+- **Enterprise Authentication**: Username/password, API keys, Google OAuth 2.0
+- **Web Dashboard**: Real-time monitoring, tool management, health checks
+- **Production Ready**: Sentry monitoring, structured logging, CORS, domain restrictions
+- **Fast Development**: uv package management, Makefile automation
+
+---
+
+## 🛠️ Make Commands
+
+```bash
+make install-all      # Install all dependencies (recommended)
+make install-dev      # Development dependencies only
+make install-prod     # Production dependencies only
+make validate         # Validate setup
+make run              # stdio transport (AI assistants)
+make run-web          # HTTP server
+make run-web-auth     # HTTP server with authentication
+make lint             # Lint code
+make format           # Format code
+make test             # Run tests
+make clean            # Clean build artifacts
+make help             # List all available commands
+```
+
+---
+
+## 🔐 Authentication
+
+### Basic Auth
+- Set `ENABLE_AUTH=true` and `SECRET_KEY` in `.env`
+- Use `/auth/token` endpoint to get JWT
+
+### API Key Auth
+- Pass `X-API-Key` header in requests
+
+### Google OAuth 2.0
+- Set up credentials in Google Cloud Console
+- Configure `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, and `GOOGLE_REDIRECT_URI` in `.env`
+- Use `/auth/google/redirect` for OAuth flow
+
+---
+
+## 🛠️ Usage Examples
+
+### AI Assistant Integration
+
+```json
+{
+  "mcpServers": {
+    "openmetadata": {
+      "command": "uv",
+      "args": ["run", "python", "-m", "src.main", "--transport", "stdio"],
+      "cwd": "/path/to/mcp-server-openmetadata",
+      "env": {
+        "OPENMETADATA_HOST": "http://localhost:8585"
+      }
+    }
+  }
+}
+```
+
+### Web API Usage
+
+```bash
+curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+     "http://localhost:8000/tools/execute" \
+     -d '{"name": "mcp_openmetadata_search_metadata", "arguments": {"query": "users", "entity_type": "table"}}'
+```
+
+---
+
+## ⚡ Available Tools (Sample)
+
+- `mcp_openmetadata_search_metadata` - Search entities
+- `mcp_openmetadata_get_entity_details` - Get entity details
+- `mcp_openmetadata_get_entity_lineage` - Data lineage
+- `mcp_openmetadata_create_glossary` - Create glossaries
+- `database_get_databases` - List databases
+- `table_get_tables` - List tables
+- `dashboards_get_dashboards` - List dashboards
+- `users_get_users` - List users
+- `test_cases_get_test_cases` - List test cases
+- ...and 170+ more covering the full OpenMetadata API
+
+---
+
+## 📊 Web Dashboard
+
+- Access at `http://localhost:8000`
+- Features: Real-time stats, tool management, health checks, API docs
+
+---
+
+## 🔍 Troubleshooting
+
+- **Connection issues**: Check `OPENMETADATA_HOST_PORT` and server status
+- **OAuth issues**: Verify Google credentials and redirect URI
+- **Tool errors**: Use debug logging (`LOG_LEVEL=DEBUG`), validate server accessibility
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+---
+
+## � License
+
+MIT License - see [LICENSE](LICENSE)
+
+---
+
+## 🆘 Support
+
+- GitHub Issues
+- Documentation in this guide
+- Security issues: contact maintainers privately
+
+---
+
+**You're all set! This MCP server provides everything you need for robust OpenMetadata integration with AI assistants and web applications.**
 - **📚 Glossary Management**: Create and manage business glossaries
 - **📋 Schema Information**: Detailed table schemas and metadata
 - **186 Tools**: Complete OpenMetadata API coverage
