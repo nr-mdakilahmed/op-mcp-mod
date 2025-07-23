@@ -5,14 +5,15 @@ CRUD operations, test execution results, and data quality monitoring.
 Test cases are data quality tests against tables, columns, and other data assets.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from collections.abc import Callable
+from typing import Any
 
 import mcp.types as types
 
-from src.openmetadata.openmetadata_client import get_client
+from src.openmetadata.openmetadata_client import get_client, format_response_as_raw_json
 
 
-def get_all_functions() -> List[tuple[Callable, str, str]]:
+def get_all_functions() -> list[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
 
     Returns:
@@ -33,14 +34,14 @@ def get_all_functions() -> List[tuple[Callable, str, str]]:
 async def list_test_cases(  # noqa: C901
     limit: int = 10,
     offset: int = 0,
-    fields: Optional[str] = None,
-    entity_link: Optional[str] = None,
-    test_suite_id: Optional[str] = None,
+    fields: str | None = None,
+    entity_link: str | None = None,
+    test_suite_id: str | None = None,
     include_all_tests: bool = False,
-    test_case_status: Optional[str] = None,
-    test_case_type: Optional[str] = None,
+    test_case_status: str | None = None,
+    test_case_type: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List test cases with pagination and filtering.
 
     Args:
@@ -84,14 +85,14 @@ async def list_test_cases(  # noqa: C901
             if test_case_fqn:
                 test_case["ui_url"] = f"{client.host}/data-quality/test-cases/{test_case_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_test_case(
     test_case_id: str,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific test case by ID.
 
     Args:
@@ -116,14 +117,14 @@ async def get_test_case(
     if test_case_fqn:
         result["ui_url"] = f"{client.host}/data-quality/test-cases/{test_case_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_test_case_by_name(
     fqn: str,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific test case by fully qualified name.
 
     Args:
@@ -148,12 +149,12 @@ async def get_test_case_by_name(
     if test_case_fqn:
         result["ui_url"] = f"{client.host}/data-quality/test-cases/{test_case_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def create_test_case(
-    test_case_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    test_case_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Create a new test case.
 
     Args:
@@ -170,13 +171,13 @@ async def create_test_case(
     if test_case_fqn:
         result["ui_url"] = f"{client.host}/data-quality/test-cases/{test_case_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def update_test_case(
     test_case_id: str,
-    test_case_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    test_case_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Update an existing test case.
 
     Args:
@@ -194,14 +195,14 @@ async def update_test_case(
     if test_case_fqn:
         result["ui_url"] = f"{client.host}/data-quality/test-cases/{test_case_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def delete_test_case(
     test_case_id: str,
     hard_delete: bool = False,
     recursive: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Delete a test case.
 
     Args:
@@ -221,11 +222,11 @@ async def delete_test_case(
 
 async def list_test_case_results(
     fqn: str,
-    start_ts: Optional[float] = None,
-    end_ts: Optional[float] = None,
+    start_ts: float | None = None,
+    end_ts: float | None = None,
     limit: int = 10,
     offset: int = 0,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List test case execution results for a specific test case.
 
     Args:
@@ -248,14 +249,14 @@ async def list_test_case_results(
 
     result = client.get(f"dataQuality/testCases/{fqn}/testCaseResult", params=params)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_test_case_results_by_name(
     fqn: str,
-    start_ts: Optional[float] = None,
-    end_ts: Optional[float] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    start_ts: float | None = None,
+    end_ts: float | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get test case results by test case FQN.
 
     Args:
@@ -276,4 +277,4 @@ async def get_test_case_results_by_name(
 
     result = client.get(f"dataQuality/testCases/testCaseResults/{fqn}", params=params)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]

@@ -1,6 +1,13 @@
 # MCP Server for OpenMetadata
 
-[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/yangkyeongmo-mcp-server-openmetadata-badge.png)](https://mseep.ai/app/yangkyeongmo-mcp-server-openmetadata)
+[![MseeP.ai Security Assessment Badge# Start development server
+make run-web
+
+# Access dashboard at http://localhost:8000
+# Use API at http://localhost:8000/tools
+```
+
+## 🔧 Available Commandsp.net/pr/yangkyeongmo-mcp-server-openmetadata-badge.png)](https://mseep.ai/app/yangkyeongmo-mcp-server-openmetadata)
 [![smithery badge](https://smithery.ai/badge/@yangkyeongmo/mcp-server-openmetadata)](https://smithery.ai/server/@yangkyeongmo/mcp-server-openmetadata)
 
 <a href="https://glama.ai/mcp/servers/lvgl5cmxa6">
@@ -12,16 +19,23 @@ A **modernized** Model Context Protocol (MCP) server for OpenMetadata with enter
 ## 🚀 Quick Start
 
 ```bash
-# 1. Install
-pip install -r requirements.txt
+# 1. Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# 2. Configure
+# 2. Install dependencies (includes web + auth + monitoring)
+make install-all
+
+# 3. Configure
 cp .env.example .env
 # Edit .env with your OpenMetadata server details
 
-# 3. Run
-python -m src.main --transport stdio  # For AI assistants
-python -m src.main --transport http   # For web apps (includes dashboard)
+# 4. Validate setup
+make validate
+
+# 5. Run
+make run            # For AI assistants (stdio)
+make run-web        # For web apps (includes dashboard)
+make run-web-auth   # With authentication enabled
 ```
 
 ## ✨ Features
@@ -30,7 +44,7 @@ python -m src.main --transport http   # For web apps (includes dashboard)
 - **Multi-Transport** - stdio, HTTP, WebSocket support  
 - **Enterprise Auth** - Username/password, API keys, Google OAuth 2.0
 - **Web Dashboard** - Real-time monitoring and management
-- **Production Ready** - Docker, Sentry monitoring, structured logging
+- **Production Ready** - uv package management, Sentry monitoring, structured logging
 
 ## 📖 Complete Documentation
 
@@ -41,7 +55,7 @@ Includes:
 - Authentication configuration (Google OAuth, API keys)
 - All 186 available tools
 - Usage examples (Python, JavaScript, curl)
-- Deployment guides (Docker, production)
+- Production deployment guides
 - Troubleshooting and support
 
 ## 🛠️ Common Use Cases
@@ -62,17 +76,34 @@ Includes:
 
 ### As Web Service
 ```bash
-# Start HTTP server with dashboard
-python -m src.main --transport http --host 0.0.0.0 --port 8000
+# Start development server
+make run-web
 
 # Access dashboard at http://localhost:8000
 # Use API at http://localhost:8000/tools
 ```
 
-### Docker Deployment
+## 🔧 Available Commands
+
 ```bash
-docker build -t mcp-openmetadata .
-docker run -p 8000:8000 --env-file .env mcp-openmetadata
+# Installation
+make install          # Basic installation
+make install-all      # Install with all extras (recommended)
+make install-web      # Install web + auth features
+
+# Setup validation
+make validate         # Verify setup is correct
+
+# Running the server
+make run              # stdio transport (for AI assistants)
+make run-sse          # SSE transport
+make run-web          # HTTP server on port 8000
+make run-web-auth     # HTTP server with authentication
+
+# Development
+make lint             # Check code quality
+make format           # Format code
+make test             # Run tests
 ```
 
 ## 🔧 Configuration

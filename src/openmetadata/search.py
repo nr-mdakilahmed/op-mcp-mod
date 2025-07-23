@@ -5,14 +5,14 @@ full-text search, entity suggestions, and advanced search filtering.
 Search APIs help discover and explore data assets across the organization.
 """
 
-from typing import Callable, List, Optional, Union
+from collections.abc import Callable
 
 import mcp.types as types
 
-from src.openmetadata.openmetadata_client import get_client
+from src.openmetadata.openmetadata_client import get_client, format_response_as_raw_json
 
 
-def get_all_functions() -> List[tuple[Callable, str, str]]:
+def get_all_functions() -> list[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
 
     Returns:
@@ -28,14 +28,14 @@ def get_all_functions() -> List[tuple[Callable, str, str]]:
 
 async def search_entities(
     q: str,
-    index: Optional[str] = None,
+    index: str | None = None,
     from_: int = 0,
     size: int = 10,
-    sort: Optional[str] = None,
-    service_name: Optional[str] = None,
-    classification: Optional[str] = None,
-    entity_type: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    sort: str | None = None,
+    service_name: str | None = None,
+    classification: str | None = None,
+    entity_type: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Search entities using query text.
 
     Args:
@@ -80,15 +80,15 @@ async def search_entities(
             if entity_type_hit and fqn:
                 source["ui_url"] = f"{client.host}/{entity_type_hit.lower()}/{fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def suggest_entities(
     q: str,
-    index: Optional[str] = None,
-    field: Optional[str] = None,
+    index: str | None = None,
+    field: str | None = None,
     size: int = 10,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get suggested entities for auto-completion.
 
     Args:
@@ -113,16 +113,16 @@ async def suggest_entities(
 
     result = client.get("search/suggest", params=params)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def search_aggregate(
     q: str,
-    index: Optional[str] = None,
+    index: str | None = None,
     from_: int = 0,
     size: int = 10,
-    facets: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    facets: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get aggregated search results with facets.
 
     Args:
@@ -149,15 +149,15 @@ async def search_aggregate(
 
     result = client.get("search/aggregate", params=params)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def search_field_query(
     field_name: str,
     field_value: str,
-    index: Optional[str] = None,
+    index: str | None = None,
     size: int = 10,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Search entities with specific field and value.
 
     Args:
@@ -181,4 +181,4 @@ async def search_field_query(
 
     result = client.get("search/fieldQuery", params=params)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]

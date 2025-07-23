@@ -5,19 +5,18 @@ enabling modular configuration of which API groups to expose.
 """
 
 from enum import Enum
-from typing import List
 
 
 class APIType(str, Enum):
     """OpenMetadata API categories for modular server configuration.
-    
+
     Each enum value corresponds to a specific OpenMetadata API group
     that can be independently enabled or disabled in the server.
     """
 
     # Core Entities - Fundamental data assets
     TABLE = "table"
-    DATABASE = "database" 
+    DATABASE = "database"
     SCHEMA = "databaseschema"  # Maps to databaseSchemas endpoint
 
     # Data Assets - Various data representations
@@ -61,9 +60,9 @@ class APIType(str, Enum):
     DOMAIN = "domain"
 
     @classmethod
-    def get_core_apis(cls) -> List[str]:
+    def get_core_apis(cls) -> list[str]:
         """Get the core API types that are enabled by default.
-        
+
         Returns:
             List of core API type values
         """
@@ -80,18 +79,18 @@ class APIType(str, Enum):
         ]
 
     @classmethod
-    def get_all_apis(cls) -> List[str]:
+    def get_all_apis(cls) -> list[str]:
         """Get all available API types.
-        
+
         Returns:
             List of all API type values
         """
         return [api.value for api in cls]
 
     @classmethod
-    def get_governance_apis(cls) -> List[str]:
+    def get_governance_apis(cls) -> list[str]:
         """Get governance-related API types.
-        
+
         Returns:
             List of governance API type values
         """
@@ -104,9 +103,9 @@ class APIType(str, Enum):
         ]
 
     @classmethod
-    def get_analytics_apis(cls) -> List[str]:
+    def get_analytics_apis(cls) -> list[str]:
         """Get analytics and monitoring API types.
-        
+
         Returns:
             List of analytics API type values
         """

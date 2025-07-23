@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "openmetadata": {
+      "command": "/Users/mdakilahmed/Documents/GitHub/op-mcp-mod/launch_mcp_stdio.sh",
+      "args": ["--stdio-only"],
+      "cwd": "/Users/mdakilahmed/Documents/GitHub/op-mcp-mod",
+      "env": {
+        "OPENMETADATA_HOST": "http://localhost:8585",
+        "OPENMETADATA_USERNAME": "admin@open-metadata.org",
+        "OPENMETADATA_PASSWORD": "admin"
+      }
+    }
+  }
+}

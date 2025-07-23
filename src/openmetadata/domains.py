@@ -5,14 +5,15 @@ CRUD operations for domains, data products, and domain organization.
 Domains help organize data assets by business context and ownership.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from collections.abc import Callable
+from typing import Any
 
 import mcp.types as types
 
-from src.openmetadata.openmetadata_client import get_client
+from src.openmetadata.openmetadata_client import get_client, format_response_as_raw_json
 
 
-def get_all_functions() -> List[tuple[Callable, str, str]]:
+def get_all_functions() -> list[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
 
     Returns:
@@ -37,10 +38,10 @@ def get_all_functions() -> List[tuple[Callable, str, str]]:
 async def list_domains(
     limit: int = 10,
     offset: int = 0,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-    q: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    q: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List domains with pagination and filtering.
 
     Args:
@@ -72,14 +73,14 @@ async def list_domains(
             if domain_name:
                 domain["ui_url"] = f"{client.host}/domain/{domain_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_domain(
     domain_id: str,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific domain by ID.
 
     Args:
@@ -104,14 +105,14 @@ async def get_domain(
     if domain_name:
         result["ui_url"] = f"{client.host}/domain/{domain_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_domain_by_name(
     name: str,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific domain by name.
 
     Args:
@@ -136,12 +137,12 @@ async def get_domain_by_name(
     if domain_name:
         result["ui_url"] = f"{client.host}/domain/{domain_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def create_domain(
-    domain_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    domain_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Create a new domain.
 
     Args:
@@ -158,13 +159,13 @@ async def create_domain(
     if domain_name:
         result["ui_url"] = f"{client.host}/domain/{domain_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def update_domain(
     domain_id: str,
-    domain_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    domain_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Update an existing domain.
 
     Args:
@@ -182,14 +183,14 @@ async def update_domain(
     if domain_name:
         result["ui_url"] = f"{client.host}/domain/{domain_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def delete_domain(
     domain_id: str,
     hard_delete: bool = False,
     recursive: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Delete a domain.
 
     Args:
@@ -210,11 +211,11 @@ async def delete_domain(
 async def list_data_products(
     limit: int = 10,
     offset: int = 0,
-    fields: Optional[str] = None,
-    domain: Optional[str] = None,
+    fields: str | None = None,
+    domain: str | None = None,
     include_deleted: bool = False,
-    q: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    q: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List data products with pagination and filtering.
 
     Args:
@@ -249,14 +250,14 @@ async def list_data_products(
             if product_fqn:
                 data_product["ui_url"] = f"{client.host}/data-product/{product_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_data_product(
     data_product_id: str,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific data product by ID.
 
     Args:
@@ -281,14 +282,14 @@ async def get_data_product(
     if product_fqn:
         result["ui_url"] = f"{client.host}/data-product/{product_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_data_product_by_name(
     name: str,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific data product by fully qualified name.
 
     Args:
@@ -313,12 +314,12 @@ async def get_data_product_by_name(
     if product_fqn:
         result["ui_url"] = f"{client.host}/data-product/{product_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def create_data_product(
-    data_product_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    data_product_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Create a new data product.
 
     Args:
@@ -335,13 +336,13 @@ async def create_data_product(
     if product_fqn:
         result["ui_url"] = f"{client.host}/data-product/{product_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def update_data_product(
     data_product_id: str,
-    data_product_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    data_product_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Update an existing data product.
 
     Args:
@@ -359,14 +360,14 @@ async def update_data_product(
     if product_fqn:
         result["ui_url"] = f"{client.host}/data-product/{product_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def delete_data_product(
     data_product_id: str,
     hard_delete: bool = False,
     recursive: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Delete a data product.
 
     Args:

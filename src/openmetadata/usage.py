@@ -5,14 +5,15 @@ retrieving usage data, access patterns, and analytics for data assets.
 Usage APIs help track how data assets are being utilized across the organization.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from collections.abc import Callable
+from typing import Any
 
 import mcp.types as types
 
-from src.openmetadata.openmetadata_client import get_client
+from src.openmetadata.openmetadata_client import get_client, format_response_as_raw_json
 
 
-def get_all_functions() -> List[tuple[Callable, str, str]]:
+def get_all_functions() -> list[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
 
     Returns:
@@ -28,9 +29,9 @@ def get_all_functions() -> List[tuple[Callable, str, str]]:
 async def get_usage_by_entity(
     entity_type: str,
     entity_id: str,
-    start_ts: Optional[int] = None,
-    end_ts: Optional[int] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    start_ts: int | None = None,
+    end_ts: int | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get usage analytics for a specific entity.
 
     Args:
@@ -51,12 +52,12 @@ async def get_usage_by_entity(
 
     result = client.get(f"usage/{entity_type}/{entity_id}", params=params)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def add_usage_data(
-    usage_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    usage_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Add usage data for entities.
 
     Args:
@@ -68,14 +69,14 @@ async def add_usage_data(
     client = get_client()
     result = client.post("usage", json_data=usage_data)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_entity_usage_summary(
     entity_type: str,
-    start_ts: Optional[int] = None,
-    end_ts: Optional[int] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    start_ts: int | None = None,
+    end_ts: int | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get usage summary for entity types.
 
     Args:
@@ -95,4 +96,4 @@ async def get_entity_usage_summary(
 
     result = client.get("usage/summary", params=params)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]

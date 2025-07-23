@@ -5,14 +5,15 @@ CRUD operations, field filtering, and pagination support.
 Bots are special users that automate tasks like ingesting metadata and running data quality checks.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from collections.abc import Callable
+from typing import Any
 
 import mcp.types as types
 
-from src.openmetadata.openmetadata_client import get_client
+from src.openmetadata.openmetadata_client import get_client, format_response_as_raw_json
 
 
-def get_all_functions() -> List[tuple[Callable, str, str]]:
+def get_all_functions() -> list[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
 
     Returns:
@@ -31,9 +32,9 @@ def get_all_functions() -> List[tuple[Callable, str, str]]:
 async def list_bots(
     limit: int = 10,
     offset: int = 0,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List bots with pagination.
 
     Args:
@@ -61,13 +62,13 @@ async def list_bots(
             if bot_name:
                 bot["ui_url"] = f"{client.host}/bot/{bot_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_bot(
     bot_id: str,
-    fields: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    fields: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific bot by ID.
 
     Args:
@@ -89,13 +90,13 @@ async def get_bot(
     if bot_name:
         result["ui_url"] = f"{client.host}/bot/{bot_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_bot_by_name(
     name: str,
-    fields: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    fields: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific bot by name.
 
     Args:
@@ -117,12 +118,12 @@ async def get_bot_by_name(
     if bot_name:
         result["ui_url"] = f"{client.host}/bot/{bot_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def create_bot(
-    bot_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    bot_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Create a new bot.
 
     Args:
@@ -139,13 +140,13 @@ async def create_bot(
     if bot_name:
         result["ui_url"] = f"{client.host}/bot/{bot_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def update_bot(
     bot_id: str,
-    bot_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    bot_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Update an existing bot.
 
     Args:
@@ -163,14 +164,14 @@ async def update_bot(
     if bot_name:
         result["ui_url"] = f"{client.host}/bot/{bot_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def delete_bot(
     bot_id: str,
     hard_delete: bool = False,
     recursive: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Delete a bot.
 
     Args:

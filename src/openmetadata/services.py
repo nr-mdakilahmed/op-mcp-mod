@@ -5,14 +5,15 @@ database services, dashboard services, messaging services, and other service typ
 Services are the connections to external systems from which metadata is collected.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from collections.abc import Callable
+from typing import Any
 
 import mcp.types as types
 
-from src.openmetadata.openmetadata_client import get_client
+from src.openmetadata.openmetadata_client import get_client, format_response_as_raw_json
 
 
-def get_all_functions() -> List[tuple[Callable, str, str]]:
+def get_all_functions() -> list[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
 
     Returns:
@@ -39,9 +40,9 @@ def get_all_functions() -> List[tuple[Callable, str, str]]:
 async def list_database_services(
     limit: int = 10,
     offset: int = 0,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List database services with pagination.
 
     Args:
@@ -69,13 +70,13 @@ async def list_database_services(
             if service_name:
                 service["ui_url"] = f"{client.host}/services/database/{service_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_database_service(
     service_id: str,
-    fields: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    fields: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific database service by ID.
 
     Args:
@@ -97,13 +98,13 @@ async def get_database_service(
     if service_name:
         result["ui_url"] = f"{client.host}/services/database/{service_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_database_service_by_name(
     service_name: str,
-    fields: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    fields: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific database service by name.
 
     Args:
@@ -125,12 +126,12 @@ async def get_database_service_by_name(
     if service_name_result:
         result["ui_url"] = f"{client.host}/services/database/{service_name_result}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def create_database_service(
-    service_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    service_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Create a new database service.
 
     Args:
@@ -147,13 +148,13 @@ async def create_database_service(
     if service_name:
         result["ui_url"] = f"{client.host}/services/database/{service_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def update_database_service(
     service_id: str,
-    service_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    service_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Update an existing database service.
 
     Args:
@@ -171,14 +172,14 @@ async def update_database_service(
     if service_name:
         result["ui_url"] = f"{client.host}/services/database/{service_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def delete_database_service(
     service_id: str,
     hard_delete: bool = False,
     recursive: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Delete a database service.
 
     Args:
@@ -200,9 +201,9 @@ async def delete_database_service(
 async def list_dashboard_services(
     limit: int = 10,
     offset: int = 0,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List dashboard services with pagination.
 
     Args:
@@ -230,13 +231,13 @@ async def list_dashboard_services(
             if service_name:
                 service["ui_url"] = f"{client.host}/services/dashboard/{service_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_dashboard_service(
     service_id: str,
-    fields: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    fields: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific dashboard service by ID.
 
     Args:
@@ -258,12 +259,12 @@ async def get_dashboard_service(
     if service_name:
         result["ui_url"] = f"{client.host}/services/dashboard/{service_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def create_dashboard_service(
-    service_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    service_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Create a new dashboard service.
 
     Args:
@@ -280,16 +281,16 @@ async def create_dashboard_service(
     if service_name:
         result["ui_url"] = f"{client.host}/services/dashboard/{service_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 # Messaging Services
 async def list_messaging_services(
     limit: int = 10,
     offset: int = 0,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List messaging services with pagination.
 
     Args:
@@ -317,13 +318,13 @@ async def list_messaging_services(
             if service_name:
                 service["ui_url"] = f"{client.host}/services/messaging/{service_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_messaging_service(
     service_id: str,
-    fields: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    fields: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific messaging service by ID.
 
     Args:
@@ -345,12 +346,12 @@ async def get_messaging_service(
     if service_name:
         result["ui_url"] = f"{client.host}/services/messaging/{service_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def create_messaging_service(
-    service_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    service_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Create a new messaging service.
 
     Args:
@@ -367,13 +368,13 @@ async def create_messaging_service(
     if service_name:
         result["ui_url"] = f"{client.host}/services/messaging/{service_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 # Utility Functions
 async def test_connection(
-    connection_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    connection_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Test connection to a service.
 
     Args:
@@ -385,4 +386,4 @@ async def test_connection(
     client = get_client()
     result = client.post("services/testConnection", json_data=connection_data)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]

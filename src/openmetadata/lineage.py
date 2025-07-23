@@ -5,14 +5,15 @@ retrieving upstream and downstream relationships, managing data flow, and
 analyzing impact across data assets.
 """
 
-from typing import Any, Callable, Dict, List, Union
+from collections.abc import Callable
+from typing import Any
 
 import mcp.types as types
 
-from src.openmetadata.openmetadata_client import get_client
+from src.openmetadata.openmetadata_client import get_client, format_response_as_raw_json
 
 
-def get_all_functions() -> List[tuple[Callable, str, str]]:
+def get_all_functions() -> list[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
 
     Returns:
@@ -31,7 +32,7 @@ async def get_lineage(
     entity_type: str = "table",
     upstream_depth: int = 1,
     downstream_depth: int = 1,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get lineage information for a specific entity.
 
     Args:
@@ -54,7 +55,7 @@ async def get_lineage(
     # Add UI URL for web interface integration
     result["ui_url"] = f"{client.host}/lineage/{entity_type}/{entity_id}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_lineage_by_name(
@@ -62,7 +63,7 @@ async def get_lineage_by_name(
     entity_type: str = "table",
     upstream_depth: int = 1,
     downstream_depth: int = 1,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get lineage information by entity fully qualified name.
 
     Args:
@@ -85,12 +86,12 @@ async def get_lineage_by_name(
     # Add UI URL for web interface integration
     result["ui_url"] = f"{client.host}/lineage/{entity_type}/{entity_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def add_lineage(
-    lineage_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    lineage_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Add or update lineage between entities.
 
     Args:
@@ -102,13 +103,13 @@ async def add_lineage(
     client = get_client()
     result = client.put("lineage", json_data=lineage_data)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def delete_lineage(
     source_fqn: str,
     target_fqn: str,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Delete lineage between entities.
 
     Args:

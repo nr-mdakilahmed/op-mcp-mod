@@ -248,8 +248,10 @@
     </div>
 
     <script>
-        // Update uptime every second
-        let startTime = Date.now() - {{ uptime * 1000 }};
+        // Update uptime every second  
+        // Get initial uptime from server template
+        const initialUptime = parseFloat('{{ uptime }}');
+        let startTime = Date.now() - (initialUptime * 1000);
         setInterval(() => {
             let uptimeSeconds = (Date.now() - startTime) / 1000;
             let hours = Math.floor(uptimeSeconds / 3600);

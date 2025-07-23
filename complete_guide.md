@@ -1,11 +1,12 @@
 # MCP Server for OpenMetadata - Complete Guide
 
-[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/yangkyeongmo-mcp-server-openmetadata-badge.png)](https://mseep.ai/app/yangkyeongmo-mcp-server-openmetadata)
-[![smithery badge](https://smithery.ai/badge/@yangkyeongmo/mcp-server-openmetadata)](https://smithery.ai/server/@yangkyeongmo/mcp-server-openmetadata)
+<div align="center">
 
-<a href="https://glama.ai/mcp/servers/lvgl5cmxa6">
-  <img width="380" height="200" src="https://glama.ai/mcp/servers/lvgl5cmxa6/badge" alt="Server for OpenMetadata MCP server" />
-</a>
+### 🔗 **[View on Glama.ai MCP Registry →](https://glama.ai/mcp/servers/@yangkyeongmo/mcp-server-openmetadata)**
+
+</div>
+
+---
 
 A **modernized** Model Context Protocol (MCP) server implementation for OpenMetadata, providing AI assistants with robust, secure access to metadata from your data ecosystem.
 
@@ -13,31 +14,30 @@ A **modernized** Model Context Protocol (MCP) server implementation for OpenMeta
 
 ### Option 1: Using with AI Assistants (Claude, ChatGPT)
 ```bash
-# Install dependencies
-pip install -r requirements.txt
+# Install uv if not already installed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install dependencies with all features
+make install-all
 
 # Configure OpenMetadata connection
 cp .env.example .env
 # Edit .env with your OpenMetadata server details
 
+# Validate setup
+make validate
+
 # Run with Claude Desktop
-python -m src.main --transport stdio
+make run
 ```
 
 ### Option 2: Web Server with Authentication
 ```bash
 # Start the remote server with authentication
-python -m src.main --transport http --host 0.0.0.0 --port 8000
+make run-web-auth
 
 # Access the web dashboard
 open http://localhost:8000
-```
-
-### Option 3: Docker Deployment
-```bash
-# Build and run with Docker
-docker build -t mcp-openmetadata .
-docker run -p 8000:8000 --env-file .env mcp-openmetadata
 ```
 
 ---
@@ -58,7 +58,7 @@ docker run -p 8000:8000 --env-file .env mcp-openmetadata
 - **📊 Web Dashboard**: Real-time management interface
 - **📈 Monitoring**: Sentry integration and structured logging
 - **🔒 Security**: JWT tokens, CORS, domain restrictions
-- **🐳 Containerized**: Docker support for deployment
+- **⚡ Modern Tooling**: uv package management for fast development
 
 ### Transport Options
 - **stdio**: Direct AI assistant integration
@@ -70,15 +70,20 @@ docker run -p 8000:8000 --env-file .env mcp-openmetadata
 ## 📦 Installation & Setup
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.9+
 - OpenMetadata server instance
-- (Optional) Google Cloud Console account for OAuth
+- uv package manager (recommended)
 
 ### 1. Clone and Install
 ```bash
 git clone https://github.com/yangkyeongmo/mcp-server-openmetadata
 cd mcp-server-openmetadata
-pip install -r requirements.txt
+
+# Install uv if not already installed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install dependencies with all features
+make install-all
 ```
 
 ### 2. Environment Configuration
@@ -117,22 +122,27 @@ SENTRY_ENVIRONMENT=production
 
 #### For AI Assistants (stdio)
 ```bash
-python -m src.main --transport stdio
+make run
 ```
 
 #### For Web Applications (HTTP)
 ```bash
-python -m src.main --transport http --host 0.0.0.0 --port 8000
+make run-web
 ```
 
-#### Interactive Testing
+#### For Web with Authentication
 ```bash
-python -m src.main --test-tools
+make run-web-auth
 ```
 
-#### List Available Tools
+#### Validate Setup
 ```bash
-python -m src.main --list-tools
+make validate
+```
+
+#### List Available Make Commands
+```bash
+make help  # or just 'make' to see available targets
 ```
 
 ---
@@ -201,11 +211,11 @@ Add to your Claude Desktop config:
 {
   "mcpServers": {
     "openmetadata": {
-      "command": "python",
-      "args": ["-m", "src.main", "--transport", "stdio"],
+      "command": "uv",
+      "args": ["run", "python", "-m", "src.main", "--transport", "stdio"],
       "cwd": "/path/to/mcp-server-openmetadata",
       "env": {
-        "OPENMETADATA_HOST_PORT": "http://localhost:8585/api"
+        "OPENMETADATA_HOST": "http://localhost:8585"
       }
     }
   }
@@ -276,6 +286,33 @@ const tools = await toolsResponse.json();
 
 ---
 
+## ⚡ Available Make Commands
+
+```bash
+# Installation
+make install          # Basic installation
+make install-all      # Install with all extras (recommended)
+make install-web      # Install web + auth features
+make install-dev      # Install development dependencies
+
+# Setup validation
+make validate         # Verify setup is correct
+
+# Running the server
+make run              # stdio transport (for AI assistants)
+make run-sse          # SSE transport
+make run-web          # HTTP server on port 8000
+make run-web-auth     # HTTP server with authentication
+
+# Development
+make lint             # Check code quality
+make format           # Format code  
+make test             # Run tests
+make clean            # Clean build artifacts
+```
+
+---
+
 ## 🔧 Available Tools (186 Total)
 
 ### Core Search & Discovery
@@ -315,36 +352,33 @@ const tools = await toolsResponse.json();
 
 ## 🚀 Deployment
 
-### Docker
-```dockerfile
-# Dockerfile already included
-docker build -t mcp-openmetadata .
-docker run -d -p 8000:8000 --env-file .env mcp-openmetadata
+### uv Package Manager (Recommended)
+```bash
+# Production deployment with all features
+make install-all
+
+# Run with validation
+make validate && make run-web
+
+# Or with authentication
+make run-web-auth
 ```
 
-### Docker Compose
-```yaml
-version: '3.8'
-services:
-  mcp-openmetadata:
-    build: .
-    ports:
-      - "8000:8000"
-    environment:
-      - OPENMETADATA_HOST_PORT=http://openmetadata:8585/api
-      - SERVER_HOST=0.0.0.0
-      - SERVER_PORT=8000
-    depends_on:
-      - openmetadata
+### Manual Python Deployment
+```bash
+# If you can't use uv, fallback to manual setup
+pip install -e .
+python -m src.main --transport http --host 0.0.0.0 --port 8000
 ```
 
-### Production Deployment
+### Production Considerations
 1. Use HTTPS for all URLs
-2. Set strong secrets and API keys
+2. Set strong secrets and API keys  
 3. Configure proper CORS origins
 4. Enable Sentry monitoring
 5. Use domain restrictions for OAuth
 6. Set up proper logging and monitoring
+7. Run `make validate` before deployment
 
 ---
 
@@ -387,10 +421,13 @@ Features:
 ```bash
 # Enable detailed logging
 export LOG_LEVEL=DEBUG
-python -m src.main --transport http
+make run-web
 
-# Interactive testing mode
-python -m src.main --test-tools
+# Validate setup first
+make validate
+
+# Check what make commands are available
+make
 ```
 
 ### Health Checks
@@ -418,17 +455,20 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/stats
 ### Development Setup
 ```bash
 # Install development dependencies
-pip install -r requirements.txt
+make install-dev
+
+# Install all features for development  
+make install-all
+
+# Run validation
+make validate
+
+# Format and lint code
+make format
+make lint
 
 # Run tests
-python -m pytest
-
-# Format code
-black src/
-isort src/
-
-# Type checking
-mypy src/
+make test
 ```
 
 ---

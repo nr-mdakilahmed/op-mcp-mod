@@ -5,14 +5,15 @@ event subscriptions, webhook configurations, event filtering, and notifications.
 Events are changes to metadata sent when entities are created, modified, or updated.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from collections.abc import Callable
+from typing import Any
 
 import mcp.types as types
 
-from src.openmetadata.openmetadata_client import get_client
+from src.openmetadata.openmetadata_client import get_client, format_response_as_raw_json
 
 
-def get_all_functions() -> List[tuple[Callable, str, str]]:
+def get_all_functions() -> list[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
 
     Returns:
@@ -35,12 +36,12 @@ def get_all_functions() -> List[tuple[Callable, str, str]]:
 async def list_events(
     limit: int = 10,
     offset: int = 0,
-    entity_type: Optional[str] = None,
-    entity_id: Optional[str] = None,
-    event_type: Optional[str] = None,
-    timestamp_start: Optional[int] = None,
-    timestamp_end: Optional[int] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    entity_type: str | None = None,
+    entity_id: str | None = None,
+    event_type: str | None = None,
+    timestamp_start: int | None = None,
+    timestamp_end: int | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List events with pagination and filtering.
 
     Args:
@@ -71,15 +72,15 @@ async def list_events(
 
     result = client.get("events", params=params)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def list_event_subscriptions(
     limit: int = 10,
     offset: int = 0,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List event subscriptions with pagination.
 
     Args:
@@ -108,13 +109,13 @@ async def list_event_subscriptions(
             if subscription_name:
                 subscription["ui_url"] = f"{client.host}/settings/members/teams/event-subscriptions/{subscription_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_event_subscription(
     subscription_id: str,
-    fields: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    fields: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific event subscription by ID.
 
     Args:
@@ -136,13 +137,13 @@ async def get_event_subscription(
     if subscription_name:
         result["ui_url"] = f"{client.host}/settings/members/teams/event-subscriptions/{subscription_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_event_subscription_by_name(
     name: str,
-    fields: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    fields: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific event subscription by name.
 
     Args:
@@ -164,12 +165,12 @@ async def get_event_subscription_by_name(
     if subscription_name:
         result["ui_url"] = f"{client.host}/settings/members/teams/event-subscriptions/{subscription_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def create_event_subscription(
-    subscription_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    subscription_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Create a new event subscription.
 
     Args:
@@ -186,13 +187,13 @@ async def create_event_subscription(
     if subscription_name:
         result["ui_url"] = f"{client.host}/settings/members/teams/event-subscriptions/{subscription_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def update_event_subscription(
     subscription_id: str,
-    subscription_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    subscription_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Update an existing event subscription.
 
     Args:
@@ -210,13 +211,13 @@ async def update_event_subscription(
     if subscription_name:
         result["ui_url"] = f"{client.host}/settings/members/teams/event-subscriptions/{subscription_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def delete_event_subscription(
     subscription_id: str,
     hard_delete: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Delete an event subscription.
 
     Args:
@@ -234,8 +235,8 @@ async def delete_event_subscription(
 
 
 async def test_destination(
-    destination_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    destination_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Test event subscription destination configuration.
 
     Args:
@@ -247,14 +248,14 @@ async def test_destination(
     client = get_client()
     result = client.post("events/subscriptions/testDestination", json_data=destination_data)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_failed_events(
     subscription_id: str,
     limit: int = 10,
     offset: int = 0,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get failed events for a specific subscription.
 
     Args:
@@ -270,13 +271,13 @@ async def get_failed_events(
 
     result = client.get(f"events/subscriptions/id/{subscription_id}/failedEvents", params=params)
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_subscription_status(
     subscription_name: str,
     destination_id: str,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get status of event subscription destination.
 
     Args:
@@ -289,4 +290,4 @@ async def get_subscription_status(
     client = get_client()
     result = client.get(f"events/subscriptions/name/{subscription_name}/status/{destination_id}")
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]

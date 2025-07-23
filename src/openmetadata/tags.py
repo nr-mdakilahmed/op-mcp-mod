@@ -5,14 +5,15 @@ CRUD operations for tags, tag categories, and tag assignments.
 Tags provide a way to categorize and organize metadata entities.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from collections.abc import Callable
+from typing import Any
 
 import mcp.types as types
 
-from src.openmetadata.openmetadata_client import get_client
+from src.openmetadata.openmetadata_client import get_client, format_response_as_raw_json
 
 
-def get_all_functions() -> List[tuple[Callable, str, str]]:
+def get_all_functions() -> list[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
 
     Returns:
@@ -36,11 +37,11 @@ def get_all_functions() -> List[tuple[Callable, str, str]]:
 async def list_tags(
     limit: int = 10,
     offset: int = 0,
-    fields: Optional[str] = None,
-    parent: Optional[str] = None,
+    fields: str | None = None,
+    parent: str | None = None,
     include_deleted: bool = False,
-    q: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    q: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List tags with pagination and filtering.
 
     Args:
@@ -75,14 +76,14 @@ async def list_tags(
             if tag_fqn:
                 tag["ui_url"] = f"{client.host}/tags/{tag_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_tag(
     tag_id: str,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific tag by ID.
 
     Args:
@@ -107,14 +108,14 @@ async def get_tag(
     if tag_fqn:
         result["ui_url"] = f"{client.host}/tags/{tag_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_tag_by_name(
     name: str,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific tag by name.
 
     Args:
@@ -139,12 +140,12 @@ async def get_tag_by_name(
     if tag_fqn:
         result["ui_url"] = f"{client.host}/tags/{tag_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def create_tag(
-    tag_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    tag_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Create a new tag.
 
     Args:
@@ -161,13 +162,13 @@ async def create_tag(
     if tag_fqn:
         result["ui_url"] = f"{client.host}/tags/{tag_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def update_tag(
     tag_id: str,
-    tag_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    tag_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Update an existing tag.
 
     Args:
@@ -185,14 +186,14 @@ async def update_tag(
     if tag_fqn:
         result["ui_url"] = f"{client.host}/tags/{tag_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def delete_tag(
     tag_id: str,
     hard_delete: bool = False,
     recursive: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Delete a tag.
 
     Args:
@@ -213,9 +214,9 @@ async def delete_tag(
 async def list_tag_categories(
     limit: int = 10,
     offset: int = 0,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List tag categories (classifications) with pagination.
 
     Args:
@@ -244,14 +245,14 @@ async def list_tag_categories(
             if class_name:
                 classification["ui_url"] = f"{client.host}/tags/{class_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_tag_category(
     name: str,
-    fields: Optional[str] = None,
+    fields: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get tag category (classification) by name.
 
     Args:
@@ -276,12 +277,12 @@ async def get_tag_category(
     if class_name:
         result["ui_url"] = f"{client.host}/tags/{class_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def create_tag_category(
-    category_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    category_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Create a new tag category (classification).
 
     Args:
@@ -298,13 +299,13 @@ async def create_tag_category(
     if class_name:
         result["ui_url"] = f"{client.host}/tags/{class_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def update_tag_category(
     category_id: str,
-    category_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    category_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Update a tag category (classification).
 
     Args:
@@ -322,14 +323,14 @@ async def update_tag_category(
     if class_name:
         result["ui_url"] = f"{client.host}/tags/{class_name}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def delete_tag_category(
     category_id: str,
     hard_delete: bool = False,
     recursive: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Delete a tag category (classification).
 
     Args:

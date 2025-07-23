@@ -5,14 +5,15 @@ CRUD operations, field filtering, pagination support, and model training metadat
 ML Models are algorithms trained on data to find patterns or make predictions.
 """
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from collections.abc import Callable
+from typing import Any
 
 import mcp.types as types
 
-from src.openmetadata.openmetadata_client import get_client
+from src.openmetadata.openmetadata_client import get_client, format_response_as_raw_json
 
 
-def get_all_functions() -> List[tuple[Callable, str, str]]:
+def get_all_functions() -> list[tuple[Callable, str, str]]:
     """Return list of (function, name, description) tuples for registration.
 
     Returns:
@@ -31,10 +32,10 @@ def get_all_functions() -> List[tuple[Callable, str, str]]:
 async def list_ml_models(
     limit: int = 10,
     offset: int = 0,
-    fields: Optional[str] = None,
-    service: Optional[str] = None,
+    fields: str | None = None,
+    service: str | None = None,
     include_deleted: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """List ML models with pagination.
 
     Args:
@@ -65,13 +66,13 @@ async def list_ml_models(
             if model_fqn:
                 model["ui_url"] = f"{client.host}/mlmodel/{model_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_ml_model(
     model_id: str,
-    fields: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    fields: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific ML model by ID.
 
     Args:
@@ -93,13 +94,13 @@ async def get_ml_model(
     if model_fqn:
         result["ui_url"] = f"{client.host}/mlmodel/{model_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def get_ml_model_by_name(
     fqn: str,
-    fields: Optional[str] = None,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    fields: str | None = None,
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Get details of a specific ML model by fully qualified name.
 
     Args:
@@ -121,12 +122,12 @@ async def get_ml_model_by_name(
     if model_fqn:
         result["ui_url"] = f"{client.host}/mlmodel/{model_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def create_ml_model(
-    model_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    model_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Create a new ML model.
 
     Args:
@@ -143,13 +144,13 @@ async def create_ml_model(
     if model_fqn:
         result["ui_url"] = f"{client.host}/mlmodel/{model_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def update_ml_model(
     model_id: str,
-    model_data: Dict[str, Any],
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+    model_data: dict[str, Any],
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Update an existing ML model.
 
     Args:
@@ -167,14 +168,14 @@ async def update_ml_model(
     if model_fqn:
         result["ui_url"] = f"{client.host}/mlmodel/{model_fqn}"
 
-    return [types.TextContent(type="text", text=str(result))]
+    return [types.TextContent(type="text", text=format_response_as_raw_json(result))]
 
 
 async def delete_ml_model(
     model_id: str,
     hard_delete: bool = False,
     recursive: bool = False,
-) -> List[Union[types.TextContent, types.ImageContent, types.EmbeddedResource]]:
+) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
     """Delete an ML model.
 
     Args:
