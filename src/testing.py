@@ -58,9 +58,15 @@ async def test_tool_execution() -> None:
             for item in result:
                 # Use getattr with default values to avoid attribute errors
                 if hasattr(item, "text"):
-                    content.append({"type": "text", "text": getattr(item, "text", str(item))})
+                    content.append({
+                        "type": "text",
+                        "text": getattr(item, "text", str(item))
+                    })
                 elif hasattr(item, "data"):
-                    content.append({"type": "resource", "data": str(getattr(item, "data", str(item)))})
+                    content.append({
+                        "type": "resource",
+                        "data": str(getattr(item, "data", str(item)))
+                    })
                 else:
                     content.append({"type": "unknown", "data": str(item)})
 
@@ -146,7 +152,10 @@ async def run_interactive_testing(config: Config) -> None:
 
                 print("\n=== Server Status ===")
                 print(f"Status: {status_dict.get('status', 'unknown')}")
-                print(f"Server: {metadata.get('title', 'Unknown')} v{metadata.get('version', '0.0.0')}")
+                print(
+                    f"Server: {metadata.get('title', 'Unknown')} "
+                    f"v{metadata.get('version', '0.0.0')}"
+                )
                 print(f"Description: {metadata.get('description', 'No description')}")
                 print(f"Tools registered: {status_dict.get('registered_tools_count', 0)}")
                 print(f"Config: OpenMetadata Host: {config.OPENMETADATA_HOST}")

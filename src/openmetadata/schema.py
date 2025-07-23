@@ -9,7 +9,10 @@ from typing import Any
 
 import mcp.types as types
 
-from src.openmetadata.openmetadata_client import get_client, format_response_as_raw_json
+from src.openmetadata.openmetadata_client import (
+    get_client,
+    format_response_as_raw_json,
+)
 
 
 def get_all_functions() -> list[tuple[Callable, str, str]]:
@@ -19,11 +22,27 @@ def get_all_functions() -> list[tuple[Callable, str, str]]:
         List of tuples containing function reference, tool name, and description
     """
     return [
-        (list_schemas, "list_schemas", "List database schemas from OpenMetadata with pagination and filtering"),
+        (
+            list_schemas,
+            "list_schemas",
+            "List database schemas from OpenMetadata with pagination and filtering",
+        ),
         (get_schema, "get_schema", "Get details of a specific schema by ID"),
-        (get_schema_by_name, "get_schema_by_name", "Get details of a specific schema by fully qualified name"),
-        (create_schema, "create_schema", "Create a new database schema in OpenMetadata"),
-        (update_schema, "update_schema", "Update an existing database schema in OpenMetadata"),
+        (
+            get_schema_by_name,
+            "get_schema_by_name",
+            "Get details of a specific schema by fully qualified name",
+        ),
+        (
+            create_schema,
+            "create_schema",
+            "Create a new database schema in OpenMetadata",
+        ),
+        (
+            update_schema,
+            "update_schema",
+            "Update an existing database schema in OpenMetadata",
+        ),
         (delete_schema, "delete_schema", "Delete a database schema from OpenMetadata"),
     ]
 
@@ -189,4 +208,6 @@ async def delete_schema(
     params = {"hardDelete": hard_delete, "recursive": recursive}
     client.delete(f"databaseSchemas/{schema_id}", params=params)
 
-    return [types.TextContent(type="text", text=f"Schema {schema_id} deleted successfully")]
+    return [
+        types.TextContent(type="text", text=f"Schema {schema_id} deleted successfully")
+    ]

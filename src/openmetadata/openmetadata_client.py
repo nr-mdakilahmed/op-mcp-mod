@@ -23,7 +23,10 @@ Examples:
     Asynchronous usage:
     ```python
     import asyncio
-    from src.openmetadata.openmetadata_client import initialize_async_client, get_async_client
+    from src.openmetadata.openmetadata_client import (
+        initialize_async_client,
+        get_async_client,
+    )
 
     # Initialize once at application startup
     initialize_async_client(host="http://localhost:8585", api_token="your-token")
@@ -61,7 +64,10 @@ logger = logging.getLogger(__name__)
 
 
 def initialize_async_client(
-    host: str, api_token: str | None = None, username: str | None = None, password: str | None = None
+    host: str,
+    api_token: str | None = None,
+    username: str | None = None,
+    password: str | None = None,
 ) -> None:
     """Initialize the global async OpenMetadata client.
 
@@ -93,7 +99,9 @@ def get_client() -> "OpenMetadataClient":
         RuntimeError: If client has not been initialized
     """
     if _client is None:
-        raise RuntimeError("OpenMetadata client not initialized. Call initialize_client() first.")
+        raise RuntimeError(
+            "OpenMetadata client not initialized. Call initialize_client() first."
+        )
     return _client
 
 
@@ -107,12 +115,17 @@ def get_async_client() -> "AsyncOpenMetadataClient":
         RuntimeError: If async client has not been initialized
     """
     if _async_client is None:
-        raise RuntimeError("Async OpenMetadata client not initialized. Call initialize_async_client() first.")
+        raise RuntimeError(
+            "Async OpenMetadata client not initialized. Call initialize_async_client() first."
+        )
     return _async_client
 
 
 def initialize_client(
-    host: str, api_token: str | None = None, username: str | None = None, password: str | None = None
+    host: str,
+    api_token: str | None = None,
+    username: str | None = None,
+    password: str | None = None,
 ) -> None:
     """Initialize the global OpenMetadata client.
 
@@ -138,7 +151,11 @@ class OpenMetadataClient:
     """
 
     def __init__(
-        self, host: str, api_token: str | None = None, username: str | None = None, password: str | None = None
+        self,
+        host: str,
+        api_token: str | None = None,
+        username: str | None = None,
+        password: str | None = None,
     ):
         """Initialize OpenMetadata client.
 
@@ -178,10 +195,15 @@ class OpenMetadataClient:
             logger.debug("Performing login authentication")
             self._authenticate_with_login()
         else:
-            raise OpenMetadataError("Either API token or username/password must be provided")
+            raise OpenMetadataError(
+                "Either API token or username/password must be provided"
+            )
 
         # Set common headers
-        self.session.headers.update({"Content-Type": "application/json", "Accept": "application/json"})
+        self.session.headers.update({
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        })
 
     def _authenticate_with_login(self) -> None:
         """Authenticate using username/password to get JWT token."""
@@ -211,14 +233,20 @@ class OpenMetadataClient:
             access_token = login_response.get("accessToken")
 
             if not access_token:
-                raise OpenMetadataError("Login successful but no access token received")
+                raise OpenMetadataError(
+                    "Login successful but no access token received"
+                )
 
             # Set the authorization header with the JWT token
             self.session.headers["Authorization"] = f"Bearer {access_token}"
-            logger.info("Successfully authenticated with OpenMetadata using username/password")
+            logger.info(
+                "Successfully authenticated with OpenMetadata using username/password"
+            )
 
         except httpx.HTTPStatusError as e:
-            error_msg = f"Login failed: HTTP {e.response.status_code}: {e.response.text}"
+            error_msg = (
+                f"Login failed: HTTP {e.response.status_code}: {e.response.text}"
+            )
             logger.error(error_msg)
             raise OpenMetadataError(error_msg) from e
         except Exception as e:
@@ -258,11 +286,15 @@ class OpenMetadataClient:
 
         while retry_count <= max_retries:
             try:
-                response = self.session.request(method=method, url=url, params=params, json=json_data)
+                response = self.session.request(
+                    method=method, url=url, params=params, json=json_data
+                )
                 response.raise_for_status()
 
                 result = response.json() if response.content else {}
-                logger.debug("Request successful, response size: %d bytes", len(response.content))
+                logger.debug(
+                    "Request successful, response size: %d bytes", len(response.content)
+                )
                 return result
 
             except httpx.HTTPStatusError as e:
@@ -316,7 +348,9 @@ class OpenMetadataClient:
         # but we need it to satisfy the type checker
         raise OpenMetadataError("Maximum retries exceeded")
 
-    def get(self, endpoint: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+    def get(
+        self, endpoint: str, params: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Make GET request to OpenMetadata API."""
         return self._make_request("GET", endpoint, params=params)
 
@@ -392,7 +426,11 @@ class AsyncOpenMetadataClient:
     """
 
     def __init__(
-        self, host: str, api_token: str | None = None, username: str | None = None, password: str | None = None
+        self,
+        host: str,
+        api_token: str | None = None,
+        username: str | None = None,
+        password: str | None = None,
     ):
         """Initialize async OpenMetadata client.
 
@@ -433,10 +471,15 @@ class AsyncOpenMetadataClient:
             # For async client, we'll need to handle authentication on first request
             self._needs_authentication = True
         else:
-            raise OpenMetadataError("Either API token or username/password must be provided")
+            raise OpenMetadataError(
+                "Either API token or username/password must be provided"
+            )
 
         # Set common headers
-        self.session.headers.update({"Content-Type": "application/json", "Accept": "application/json"})
+        self.session.headers.update({
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        })
 
     async def _authenticate_with_login(self) -> None:
         """Authenticate using username/password to get JWT token (async)."""
@@ -462,12 +505,16 @@ class AsyncOpenMetadataClient:
             access_token = login_response.get("accessToken")
 
             if not access_token:
-                raise OpenMetadataError("Login successful but no access token received")
+                raise OpenMetadataError(
+                    "Login successful but no access token received"
+                )
 
             # Set the authorization header with the JWT token
             self.session.headers["Authorization"] = f"Bearer {access_token}"
             self._needs_authentication = False
-            logger.info("Successfully authenticated with OpenMetadata using username/password (async)")
+            logger.info(
+                "Successfully authenticated with OpenMetadata using username/password (async)"
+            )
 
         except httpx.HTTPStatusError as e:
             error_msg = f"Async login failed: HTTP {e.response.status_code}: {e.response.text}"
@@ -572,7 +619,9 @@ class AsyncOpenMetadataClient:
         # but we need it to satisfy the type checker
         raise OpenMetadataError("Maximum retries exceeded")
 
-    async def get(self, endpoint: str, params: dict[str, Any] | None = None) -> dict[str, Any]:
+    async def get(
+        self, endpoint: str, params: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Make async GET request to OpenMetadata API."""
         return await self._make_request("GET", endpoint, params=params)
 
@@ -584,7 +633,9 @@ class AsyncOpenMetadataClient:
         """Make async PUT request to OpenMetadata API."""
         return await self._make_request("PUT", endpoint, json_data=json_data)
 
-    async def delete(self, endpoint: str, params: dict[str, Any] | None = None) -> None:
+    async def delete(
+        self, endpoint: str, params: dict[str, Any] | None = None
+    ) -> None:
         """Make async DELETE request to OpenMetadata API."""
         await self._make_request("DELETE", endpoint, params=params)
 

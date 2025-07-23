@@ -87,7 +87,9 @@ def setup_sentry(config: Config | None = None) -> bool:
         config = Config.from_env()
 
     if not SENTRY_AVAILABLE:
-        logging.warning("Sentry SDK not available. Install with: pip install sentry-sdk[fastapi]")
+        logging.warning(
+            "Sentry SDK not available. Install with: pip install sentry-sdk[fastapi]"
+        )
         return False
 
     if not config.SENTRY_DSN:
@@ -114,7 +116,9 @@ def setup_sentry(config: Config | None = None) -> bool:
             before_send=filter_sentry_events,
         )
 
-        logging.info("Sentry monitoring initialized for environment: %s", config.SENTRY_ENVIRONMENT)
+        logging.info(
+            "Sentry monitoring initialized for environment: %s", config.SENTRY_ENVIRONMENT
+        )
         return True
 
     except ImportError as e:
@@ -125,7 +129,9 @@ def setup_sentry(config: Config | None = None) -> bool:
         return False
 
 
-def filter_sentry_events(event: dict[str, Any], hint: dict[str, Any]) -> dict[str, Any] | None:
+def filter_sentry_events(
+    event: dict[str, Any], hint: dict[str, Any]
+) -> dict[str, Any] | None:
     """Filter Sentry events to reduce noise."""
     # Don't send certain types of exceptions
     if "exc_info" in hint:
@@ -170,7 +176,9 @@ class MCPMetrics:
         self.total_response_time = 0.0
         self.errors_by_type = {}
 
-    def record_tool_call(self, success: bool, response_time: float, error_type: str | None = None):
+    def record_tool_call(
+        self, success: bool, response_time: float, error_type: str | None = None
+    ):
         """Record metrics for a tool call."""
         self.tool_calls += 1
         self.total_response_time += response_time
@@ -180,17 +188,23 @@ class MCPMetrics:
         else:
             self.failed_calls += 1
             if error_type:
-                self.errors_by_type[error_type] = self.errors_by_type.get(error_type, 0) + 1
+                self.errors_by_type[error_type] = (
+                    self.errors_by_type.get(error_type, 0) + 1
+                )
 
     def get_stats(self) -> dict[str, Any]:
         """Get current metrics statistics."""
-        avg_response_time = self.total_response_time / self.tool_calls if self.tool_calls > 0 else 0.0
+        avg_response_time = (
+            self.total_response_time / self.tool_calls if self.tool_calls > 0 else 0.0
+        )
 
         return {
             "total_calls": self.tool_calls,
             "successful_calls": self.successful_calls,
             "failed_calls": self.failed_calls,
-            "success_rate": self.successful_calls / self.tool_calls if self.tool_calls > 0 else 0.0,
+            "success_rate": (
+                self.successful_calls / self.tool_calls if self.tool_calls > 0 else 0.0
+            ),
             "average_response_time": avg_response_time,
             "errors_by_type": self.errors_by_type,
         }
@@ -239,7 +253,9 @@ def log_mcp_operation(
             sentry_sdk.capture_exception(error)
 
 
-def initialize_monitoring(config: Config | None = None, transport: str = None) -> dict[str, bool]:
+def initialize_monitoring(
+    config: Config | None = None, transport: str = None
+) -> dict[str, bool]:
     """Initialize all monitoring systems.
 
     Args:
