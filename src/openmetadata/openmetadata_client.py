@@ -47,6 +47,7 @@ include retry logic with exponential backoff for transient errors.
 # pylint: disable=global-statement
 
 import asyncio
+import base64
 import json
 import logging
 import time
@@ -207,8 +208,6 @@ class OpenMetadataClient:
 
     def _authenticate_with_login(self) -> None:
         """Authenticate using username/password to get JWT token."""
-        import base64
-
         # Encode password in base64 as required by OpenMetadata
         encoded_password = base64.b64encode(self._password.encode()).decode()
 
@@ -319,7 +318,10 @@ class OpenMetadataClient:
                     continue
 
                 # Max retries exceeded
-                error_msg = f"HTTP {e.response.status_code} after {max_retries} retries: {e.response.text}"
+                error_msg = (
+                    f"HTTP {e.response.status_code} after {max_retries} retries: "
+                    f"{e.response.text}"
+                )
                 logger.error("API request failed: %s", error_msg)
                 raise OpenMetadataError(error_msg) from e
 
@@ -328,7 +330,8 @@ class OpenMetadataClient:
                 if retry_count < max_retries:
                     retry_count += 1
                     logger.warning(
-                        "Network error, retrying %d/%d after %.1fs: %s", retry_count, max_retries, backoff, str(e)
+                        "Network error, retrying %d/%d after %.1fs: %s",
+                        retry_count, max_retries, backoff, str(e)
                     )
                     time.sleep(backoff)
                     backoff *= 2  # Exponential backoff
@@ -483,8 +486,6 @@ class AsyncOpenMetadataClient:
 
     async def _authenticate_with_login(self) -> None:
         """Authenticate using username/password to get JWT token (async)."""
-        import base64
-
         # Encode password in base64 as required by OpenMetadata
         encoded_password = base64.b64encode(self._password.encode()).decode()
 
@@ -517,7 +518,9 @@ class AsyncOpenMetadataClient:
             )
 
         except httpx.HTTPStatusError as e:
-            error_msg = f"Async login failed: HTTP {e.response.status_code}: {e.response.text}"
+            error_msg = (
+                f"Async login failed: HTTP {e.response.status_code}: {e.response.text}"
+            )
             logger.error(error_msg)
             raise OpenMetadataError(error_msg) from e
         except Exception as e:
@@ -561,11 +564,15 @@ class AsyncOpenMetadataClient:
 
         while retry_count <= max_retries:
             try:
-                response = await self.session.request(method=method, url=url, params=params, json=json_data)
+                response = await self.session.request(
+                    method=method, url=url, params=params, json=json_data
+                )
                 response.raise_for_status()
 
                 result = response.json() if response.content else {}
-                logger.debug("Async request successful, response size: %d bytes", len(response.content))
+                logger.debug(
+                    "Async request successful, response size: %d bytes", len(response.content)
+                )
                 return result
 
             except httpx.HTTPStatusError as e:
@@ -590,7 +597,10 @@ class AsyncOpenMetadataClient:
                     continue
 
                 # Max retries exceeded
-                error_msg = f"HTTP {e.response.status_code} after {max_retries} retries: {e.response.text}"
+                error_msg = (
+                    f"HTTP {e.response.status_code} after {max_retries} retries: "
+                    f"{e.response.text}"
+                )
                 logger.error("Async API request failed: %s", error_msg)
                 raise OpenMetadataError(error_msg) from e
 
@@ -599,7 +609,8 @@ class AsyncOpenMetadataClient:
                 if retry_count < max_retries:
                     retry_count += 1
                     logger.warning(
-                        "Network error, retrying %d/%d after %.1fs: %s", retry_count, max_retries, backoff, str(e)
+                        "Network error, retrying %d/%d after %.1fs: %s",
+                        retry_count, max_retries, backoff, str(e)
                     )
                     await asyncio.sleep(backoff)
                     backoff *= 2  # Exponential backoff
